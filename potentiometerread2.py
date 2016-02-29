@@ -104,10 +104,6 @@ try:
                 sock.sendall(message)
         except:
                 print('sending data failed.')
-                     
-        if DEBUG:
-                print "set_volume", set_volume
-                print "tri_pot_changed", set_volume
                 
         # save the potentiometer reading for the next loop
         
