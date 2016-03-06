@@ -2,10 +2,11 @@ __author__ = 'YutongGu'
 import time
 import RPi.GPIO as GPIO
 from socket import *
-import sys
 import threading
+import SCPiDisplay
+from SCPiDisplay import *
 
-class PiConnector:
+class Connector:
     HOST='10.120.112.75'
     PORT=13000
     message=''
@@ -22,18 +23,13 @@ class PiConnector:
     last_read = [0]*len(potentiometer_adc)       # this keeps track of the last potentiometer value
     set_value=[0]*len(potentiometer_adc)
     return_value=[0]*len(potentiometer_adc)
+    value_names=("cabintemp","motortemp","batterytemp","motorrmp","solarvolt","batvolt")
     pot_adjust=[0]*len(potentiometer_adc)
     tolerance = 10
-    ftemp=0;
+    ftemp=0
 
     #should move this somewhere else
-    data={'cabintemp': return_value[0],
-            'motortemp': return_value[1],
-            'batterytemp': return_value[2],
-            'motorrpm': 25,
-            'solarvolt': ftemp,
-            'batvolt': 50
-          }
+
 
     def __init__(self):
         # set up the SPI interface pins
@@ -54,21 +50,21 @@ class PiConnector:
         #set up socket
         try:
             #create an AF_INET, STREAM socket (TCP)
-            self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         except socket.error, msg:
             print 'Failed to create socket. Error code: ' + str(msg[0]) + ' , Error message : ' + msg[1]
             sys.exit()
         print 'Socket Created'
 
-        self.startclient()
+        #self.startclient()
 
         pass
 
         # 10k trim pot connected to adc #0
 
     def startclient(self):
-        self.keepthreading=True;
+        self.keepthreading=True
         try:
             self.sock.connect((self.HOST,self.PORT))
             self.connected=True
@@ -104,12 +100,22 @@ class PiConnector:
             self.ftemp=(self.return_value[3]*1.8)+32
             self.ftemp=round(self.ftemp)
             self.ftemp=int(self.ftemp)
+            self.return_value[3]=self.ftemp
+            self.updateData()
             time.sleep(0.1)
+
+    def updateData(self):
+        for i in range(0, len(self.value_names)):
+            SCPiDisplay.data[self.value_names[i]].setCurrentVal(int(self.return_value[i]))
+            Display.scales[i].set(int(self.return_value[i]))
+        pass
 
     def transmitData(self):
         self.listening = True
         failedAttempts=0
-        message= 'cabintemp:'+str(self.return_value[0])+';solarvolt:'+str(self.return_value[1])+';batvolt:50;batterytemp:'+str(self.ftemp)+';motorrpm:'+str(self.return_value[2])+';motortemp:50'
+        message=""
+        for x in range(0,len(self.value_names)):
+            message=message+ str(self.value_names[x])+':'+str(self.return_value[x])+';'
         while self.keepthreading:
             if(failedAttempts>=100):
                 self.keepthreading=False
