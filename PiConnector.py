@@ -5,9 +5,10 @@ from socket import *
 import threading
 import SCPiDisplay
 from SCPiDisplay import *
+from Datalists import Datalists
 
 class Connector:
-    HOST='10.120.112.75'
+    HOST='10.120.60.51'
     PORT=13000
     message=''
     keepthreading=True
@@ -23,16 +24,17 @@ class Connector:
     last_read = [0]*len(potentiometer_adc)       # this keeps track of the last potentiometer value
     set_value=[0]*len(potentiometer_adc)
     return_value=[0]*len(potentiometer_adc)
-    value_names=("cabintemp","motortemp","batterytemp","motorrmp","solarvolt","batvolt")
+    value_names=("cabintemp","motortemp","batterytemp","motorrpm","solarvolt","batvolt")
     pot_adjust=[0]*len(potentiometer_adc)
     tolerance = 10
     ftemp=0
-
+    
     #should move this somewhere else
 
 
-    def __init__(self):
+    def __init__(self, data):
         # set up the SPI interface pins
+        self.datalist=data
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.SPIMOSI, GPIO.OUT)
         GPIO.setup(self.SPIMISO, GPIO.IN)
@@ -41,7 +43,7 @@ class Connector:
                # to keep from being jittery we'll only change
                             # volume when the pot has moved more than 5 'counts'
         try:
-            thread1 = threading.Thread(target=self.sample(), args=())
+            thread1 = threading.Thread(target=self.sample, args=())
             thread1.daemon = True
             thread1.start()
         except:
@@ -52,10 +54,9 @@ class Connector:
             #create an AF_INET, STREAM socket (TCP)
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        except socket.error, msg:
-            print 'Failed to create socket. Error code: ' + str(msg[0]) + ' , Error message : ' + msg[1]
-            sys.exit()
-        print 'Socket Created'
+        except:
+            print 'Failed to create socket'
+        #print 'Socket Created'
 
         #self.startclient()
 
@@ -82,13 +83,13 @@ class Connector:
             print('failed to thread transmitData')
 
     def sample(self):
-
+        
         while self.keepthreading:
             # read the analog pin
-
+            print('sampling')
             for x in range(0, len(self.potentiometer_adc)):
                 self.trim_pot[x] = self.readadc(self.potentiometer_adc[x], self.SPICLK, self.SPIMOSI, self.SPIMISO, self.SPICS)
-
+                
                 # how much has it changed since the last read?
                 self.pot_adjust[x] = abs(self.trim_pot[x] - self.last_read[x])
 
@@ -97,17 +98,17 @@ class Connector:
                     self.return_value[x] = round(self.set_value[x])          # round out decimal value
                     self.return_value[x] = int(self.return_value[x])            # cast volume as integer
                     self.last_read[x] = self.trim_pot[x]
-            self.ftemp=(self.return_value[3]*1.8)+32
-            self.ftemp=round(self.ftemp)
-            self.ftemp=int(self.ftemp)
-            self.return_value[3]=self.ftemp
-            self.updateData()
-            time.sleep(0.1)
+                self.ftemp=(self.return_value[3]*1.8)+32
+                self.ftemp=round(self.ftemp)
+                self.ftemp=int(self.ftemp)
+                self.updateData()
+                time.sleep(0.1)
 
     def updateData(self):
-        for i in range(0, len(self.value_names)):
-            SCPiDisplay.data[self.value_names[i]].setCurrentVal(int(self.return_value[i]))
-            Display.scales[i].set(int(self.return_value[i]))
+        #print self.datalist.data.values() 
+        for i in range(0, len(self.return_value)):
+            
+            self.datalist.data[self.value_names[i]]=int(self.return_value[i])
         pass
 
     def transmitData(self):
@@ -130,7 +131,7 @@ class Connector:
         self.listening = False
 
     # read SPI data from MCP3008 chip, 8 possible adc's (0 thru 7)
-    def readadc(adcnum, clockpin, mosipin, misopin, cspin):
+    def readadc(self, adcnum, clockpin, mosipin, misopin, cspin):
             if ((adcnum > 7) or (adcnum < 0)):
                     return -1
             GPIO.output(cspin, True)

@@ -1,25 +1,20 @@
 __author__ = 'YutongGu'
 
-from PiConnector import Connector
+from PiConnector import *
 from Tkinter import *
+import time
+from Datalists import Datalists
 
-data={'cabintemp': 0,
-            'motortemp': 0,
-            'batterytemp': 0,
-            'motorrpm': 0,
-            'solarvolt': 0,
-            'batvolt': 0
-          }
 
 class Display():
-    w1=object
-    w2=object
-    w3=object
-    w4=object
-    w5=object
-    w6=object
-    w7=object
-    scales=(w1,w2,w3,w4,w5,w6,w7)
+    
+    w1=Scale()
+    w2=Scale()
+    w3=Scale()
+    w4=Scale()
+    w5=Scale()
+    w6=Scale()
+    scales=[w1,w2,w3,w4,w5,w6]
 
     def run(self):
         if(connect.connected==False):
@@ -27,8 +22,17 @@ class Display():
             print('Successfully connected!')
         else:
             print('Already connected!')
-
-
+            
+    def update(self):
+            x=0
+            values=self.datalist.data.values()
+            print values
+            for i in values:
+                self.scales[x].set(i)
+                self.scales[x].pack()
+                x=x+1
+            self.master.after(500, self.update)
+                
     def quit(self):
         if(connect.connected==True):
             connect.close()
@@ -38,47 +42,49 @@ class Display():
         sys.exit()
         #App.stop()
 
-    def build(self):
+    def __init__(self):
+        print('starting')
         global connect
-        connect=Connector()
-        master = Tk()
-        w1_label = Label(master, text="cabintemp")
+        self.datalist=Datalists()
+        connect=Connector(self.datalist)
+        self.master = Tk()
+        w1_label = Label(self.master, text="cabintemp")
         w1_label.pack()
-        self.w1 = Scale(master, from_=0, to=100, orient=HORIZONTAL, state=DISABLED)
-        self.w1.pack()
-        self.w1.set(0)
-        w2_label = Label(master, text="solarvolt")
+        self.scales[0] = Scale(self.master, from_=0, to=100, orient=HORIZONTAL)
+        self.scales[0].pack()
+        self.scales[0].set(0)
+        w2_label = Label(self.master, text="solarvolt")
         w2_label.pack()
-        self.w2 = Scale(master, from_=0, to=100, orient=HORIZONTAL, state=DISABLED)
-        self.w2.pack()
-        self.w2.set(0)
-        w3_label = Label(master, text="batvolt")
+        self.scales[1] = Scale(self.master, from_=0, to=100, orient=HORIZONTAL)
+        self.scales[1].pack()
+        self.scales[1].set(0)
+        w3_label = Label(self.master, text="batvolt")
         w3_label.pack()
-        self.w3 = Scale(master, from_=0, to=100, orient=HORIZONTAL, state=DISABLED)
-        self.w3.pack()
-        self.w3.set(0)
-        w4_label = Label(master, text="batterytemp")
+        self.scales[2] = Scale(self.master, from_=0, to=100, orient=HORIZONTAL)
+        self.scales[2].pack()
+        self.scales[2].set(0)
+        w4_label = Label(self.master, text="batterytemp")
         w4_label.pack()
-        self.w4 = Scale(master, from_=0, to=100, orient=HORIZONTAL, state=DISABLED)
-        self.w4.pack()
-        self.w4.set(0)
-        w5_label = Label(master, text="motorrpm")
+        self.scales[3] = Scale(self.master, from_=0, to=100, orient=HORIZONTAL)
+        self.scales[3].pack()
+        self.scales[3].set(0)
+        w5_label = Label(self.master, text="motorrpm")
         w5_label.pack()
-        self.w5 = Scale(master, from_=0, to=100, orient=HORIZONTAL, state=DISABLED)
-        self.w5.pack()
-        self.w5.set(0)
-        w6_label = Label(master, text="motortemp")
+        self.scales[4] = Scale(self.master, from_=0, to=100, orient=HORIZONTAL)
+        self.scales[4].pack()
+        self.scales[4].set(0)
+        w6_label = Label(self.master, text="motortemp")
         w6_label.pack()
-        self.w6 = Scale(master, from_=0, to=100, orient=HORIZONTAL, state=DISABLED)
-        self.w6.pack()
-        self.w6.set(0)
-        w7 =Button(master, text="Connect", command=self.run)
+        self.scales[5] = Scale(self.master, from_=0, to=100, orient=HORIZONTAL)
+        self.scales[5].pack()
+        self.scales[5].set(0)
+        w7 =Button(self.master, text="Connect", command=self.run)
         w7.pack()
-        w7 =Button(master, text="Disconnect", command=self.quit)
+        w7 =Button(self.master, text="Disconnect", command=self.quit)
         w7.pack()
-
-        master.protocol("WM_DELETE_WINDOW", quit)
-        master.mainloop()
+        self.update()
+        self.master.protocol("WM_DELETE_WINDOW", quit)
+        self.master.mainloop()
 
 
 
