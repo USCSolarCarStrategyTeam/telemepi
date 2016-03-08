@@ -1,14 +1,14 @@
 __author__ = 'YutongGu'
 import time
 import RPi.GPIO as GPIO
-from socket import *
+import socket
 import threading
 import SCPiDisplay
 from SCPiDisplay import *
 from Datalists import Datalists
 
 class Connector:
-    HOST='10.120.60.51'
+    HOST='10.120.57.167'
     PORT=13000
     message=''
     keepsampling=True
@@ -27,6 +27,8 @@ class Connector:
     pot_adjust=[0]*len(potentiometer_adc)
     tolerance = 10
     ftemp=0
+    SAMPLESPEED_S=0.066
+    TRANSMITSPEED_S=0.500
     
     #should move this somewhere else
 
@@ -48,13 +50,7 @@ class Connector:
         except:
             print 'failed to thread sample'
 
-        #set up socket
-        try:
-            #create an AF_INET, STREAM socket (TCP)
-            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-        except:
-            print 'Failed to create socket'
+        
         #print 'Socket Created'
 
         #self.startclient()
@@ -64,18 +60,25 @@ class Connector:
         # 10k trim pot connected to adc #0
 
     def startclient(self):
-        self.keepsampling=True
+        #set up socket
+        try:
+            #create an AF_INET, STREAM socket (TCP)
+            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        except:
+            print 'Failed to create socket'
         try:
             self.sock.connect((self.HOST,self.PORT))
             self.connected=True
+            print('connection established')
         except:
             print('connection cannot be established')
-            GPIO.cleanup()
+            
             pass
-        print('connection established')
+        
 
         try:
-            thread2 = threading.Thread(target=self.transmitData(), args=())
+            thread2 = threading.Thread(target=self.transmitData, args=())
             thread2.daemon = True
             thread2.start()
         except:
@@ -85,7 +88,7 @@ class Connector:
         
         while self.keepsampling:
             # read the analog pin
-            print('sampling')
+            #print('sampling')
             for x in range(0, len(self.potentiometer_adc)):
                 self.trim_pot[x] = self.readadc(self.potentiometer_adc[x], self.SPICLK, self.SPIMOSI, self.SPIMISO, self.SPICS)
                 
@@ -101,7 +104,7 @@ class Connector:
                 self.ftemp=round(self.ftemp)
                 self.ftemp=int(self.ftemp)
                 self.updateData()
-                time.sleep(0.1)
+                time.sleep(self.SAMPLESPEED_S)
         GPIO.cleanup()
 
     def updateData(self):
@@ -113,10 +116,16 @@ class Connector:
 
     def transmitData(self):
         failedAttempts=0
-        message=""
+        
         while self.connected:
+            message=""
             for x in range(0,len(self.value_names)):
-                message=message+ str(self.value_names[x])+':'+str(self.return_value[x])+';'
+                if(x<len(self.return_value)):
+                    message=message+ str(self.value_names[x])+':'+str(self.return_value[x])+';'
+                else:
+                    message=message+ str(self.value_names[x])+':0;'
+            message=message[:-1]
+            #print message
             if(failedAttempts>=100):
                 self.sock.close()
                 self.connected=False
@@ -126,6 +135,7 @@ class Connector:
             except:
                 print('sending data failed.')
                 failedAttempts+=1
+            time.sleep(self.TRANSMITSPEED_S)
 
 
     # read SPI data from MCP3008 chip, 8 possible adc's (0 thru 7)
@@ -165,13 +175,18 @@ class Connector:
 
     def closeserv(self):
         if(self.connected == True):
-            self.sock.sendall("quit")
+            try:
+                self.sock.sendall("quit")
+            except:
+                print 'connection already closed'
             self.sock.close()
             self.connected=False
 
     def closeall(self):
         self.closeserv()
         self.keepsampling=False
+        GPIO.cleanup()
+        print "gpio cleaned up"
     # change these as desired - they're the pins connected from the
     # SPI port on the ADC to the Cobbler
 

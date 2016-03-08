@@ -15,41 +15,44 @@ class Display():
     w5=Scale()
     w6=Scale()
     scales=[w1,w2,w3,w4,w5,w6]
+    UPDATESPEED_MS=100
 
     def quit(self):
-        connect.closeall()
+        self.connector.closeall()
+        #print "connector"
+        self.master.quit()
+        
 
     def connect(self):
-        if(connect.connected==False):
-            connect.startclient()
-            print('Successfully connected!')
+        if(self.connector.connected==False):
+            print('Trying to connect')
+            self.connector.startclient()
         else:
             print('Already connected!')
             
     def update(self):
             x=0
             values=self.datalist.data.values()
-            print values
+            #print values
             for i in values:
                 self.scales[x].set(i)
                 self.scales[x].pack()
                 x=x+1
-            self.master.after(500, self.update)
+            self.master.after(self.UPDATESPEED_MS, self.update)
                 
     def disconnect(self):
-        if(connect.connected==True):
-            connect.closeserv()
-            print("Successfully closed")
+        if(self.connector.connected==True):
+            print("Trying to close")
+            self.connector.closeserv()
         else:
             print("Already closed")
-        sys.exit()
         #App.stop()
 
     def __init__(self):
         print('starting')
-        global connect
+        
         self.datalist=Datalists()
-        connect=Connector(self.datalist)
+        self.connector=Connector(self.datalist)
         self.master = Tk()
         w1_label = Label(self.master, text="cabintemp")
         w1_label.pack()
@@ -86,7 +89,7 @@ class Display():
         w7 =Button(self.master, text="Disconnect", command=self.disconnect)
         w7.pack()
         self.update()
-        self.master.protocol("WM_DELETE_WINDOW", quit)
+        self.master.protocol("WM_DELETE_WINDOW", self.quit)
         self.master.mainloop()
 
 
