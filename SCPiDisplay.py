@@ -16,9 +16,12 @@ class Display():
     w6=Scale()
     scales=[w1,w2,w3,w4,w5,w6]
 
-    def run(self):
+    def quit(self):
+        connect.closeall()
+
+    def connect(self):
         if(connect.connected==False):
-            connect.startserv()
+            connect.startclient()
             print('Successfully connected!')
         else:
             print('Already connected!')
@@ -33,9 +36,9 @@ class Display():
                 x=x+1
             self.master.after(500, self.update)
                 
-    def quit(self):
+    def disconnect(self):
         if(connect.connected==True):
-            connect.close()
+            connect.closeserv()
             print("Successfully closed")
         else:
             print("Already closed")
@@ -78,9 +81,9 @@ class Display():
         self.scales[5] = Scale(self.master, from_=0, to=100, orient=HORIZONTAL)
         self.scales[5].pack()
         self.scales[5].set(0)
-        w7 =Button(self.master, text="Connect", command=self.run)
+        w7 =Button(self.master, text="Connect", command=self.connect)
         w7.pack()
-        w7 =Button(self.master, text="Disconnect", command=self.quit)
+        w7 =Button(self.master, text="Disconnect", command=self.disconnect)
         w7.pack()
         self.update()
         self.master.protocol("WM_DELETE_WINDOW", quit)

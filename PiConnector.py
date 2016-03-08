@@ -11,9 +11,8 @@ class Connector:
     HOST='10.120.60.51'
     PORT=13000
     message=''
-    keepthreading=True
+    keepsampling=True
     connected=False
-    listening=False
     SPICLK = 18
     SPIMISO = 23
     SPIMOSI = 24
@@ -65,14 +64,14 @@ class Connector:
         # 10k trim pot connected to adc #0
 
     def startclient(self):
-        self.keepthreading=True
+        self.keepsampling=True
         try:
             self.sock.connect((self.HOST,self.PORT))
             self.connected=True
         except:
             print('connection cannot be established')
             GPIO.cleanup()
-            sys.exit(0)
+            pass
         print('connection established')
 
         try:
@@ -84,7 +83,7 @@ class Connector:
 
     def sample(self):
         
-        while self.keepthreading:
+        while self.keepsampling:
             # read the analog pin
             print('sampling')
             for x in range(0, len(self.potentiometer_adc)):
@@ -103,6 +102,7 @@ class Connector:
                 self.ftemp=int(self.ftemp)
                 self.updateData()
                 time.sleep(0.1)
+        GPIO.cleanup()
 
     def updateData(self):
         #print self.datalist.data.values() 
@@ -112,23 +112,21 @@ class Connector:
         pass
 
     def transmitData(self):
-        self.listening = True
         failedAttempts=0
         message=""
-        for x in range(0,len(self.value_names)):
-            message=message+ str(self.value_names[x])+':'+str(self.return_value[x])+';'
-        while self.keepthreading:
+        while self.connected:
+            for x in range(0,len(self.value_names)):
+                message=message+ str(self.value_names[x])+':'+str(self.return_value[x])+';'
             if(failedAttempts>=100):
-                self.keepthreading=False
                 self.sock.close()
-                break
+                self.connected=False
+                continue
             try:
                 self.sock.sendall(message)
             except:
                 print('sending data failed.')
                 failedAttempts+=1
-                continue
-        self.listening = False
+
 
     # read SPI data from MCP3008 chip, 8 possible adc's (0 thru 7)
     def readadc(self, adcnum, clockpin, mosipin, misopin, cspin):
@@ -165,12 +163,15 @@ class Connector:
             adcout >>= 1       # first bit is 'null' so drop it
             return adcout
 
-    def close(self):
+    def closeserv(self):
         if(self.connected == True):
-            self.keepthreading=False
             self.sock.sendall("quit")
             self.sock.close()
+            self.connected=False
 
+    def closeall(self):
+        self.closeserv()
+        self.keepsampling=False
     # change these as desired - they're the pins connected from the
     # SPI port on the ADC to the Cobbler
 
