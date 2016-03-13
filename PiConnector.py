@@ -28,7 +28,7 @@ class Connector:
     tolerance = 10
     ftemp=0
     SAMPLESPEED_S=0.066
-    TRANSMITSPEED_S=0.500
+    TIMEOUT=15
     
     #should move this somewhere else
 
@@ -64,7 +64,7 @@ class Connector:
         try:
             #create an AF_INET, STREAM socket (TCP)
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+            self.sock.settimeout(self.TIMEOUT);
         except:
             print 'Failed to create socket'
         try:
@@ -75,7 +75,6 @@ class Connector:
             print('connection cannot be established')
             
             pass
-        
 
         try:
             thread2 = threading.Thread(target=self.transmitData, args=())
@@ -119,23 +118,30 @@ class Connector:
         
         while self.connected:
             message=""
-            for x in range(0,len(self.value_names)):
-                if(x<len(self.return_value)):
-                    message=message+ str(self.value_names[x])+':'+str(self.return_value[x])+';'
-                else:
-                    message=message+ str(self.value_names[x])+':0;'
-            message=message[:-1]
-            #print message
-            if(failedAttempts>=100):
-                self.sock.close()
-                self.connected=False
-                continue
             try:
-                self.sock.sendall(message)
-            except:
-                print('sending data failed.')
-                failedAttempts+=1
-            time.sleep(self.TRANSMITSPEED_S)
+                polling=self.sock.recv(16)
+            except socket.timeout:
+                print("Connection timed out. Disconnected")
+                self.closeserv()
+                break
+
+            if(polling=="poll"):
+                for x in range(0,len(self.value_names)):
+                    if(x<len(self.return_value)):
+                        message=message+ str(self.value_names[x])+':'+str(self.return_value[x])+';'
+                    else:
+                        message=message+ str(self.value_names[x])+':0;'
+                message=message[:-1]
+                #print message
+                if(failedAttempts>=100):
+                    self.closeserv()
+                    break
+                try:
+                    self.sock.sendall(message)
+                except:
+                    print('sending data failed.')
+                    failedAttempts+=1
+                #time.sleep(self.TRANSMITSPEED_S)
 
 
     # read SPI data from MCP3008 chip, 8 possible adc's (0 thru 7)
