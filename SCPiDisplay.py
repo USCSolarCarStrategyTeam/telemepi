@@ -1,6 +1,6 @@
 __author__ = 'YutongGu'
 
-#from PiConnector import *
+from PiConnector import *
 from Tkinter import *
 from Datalists import Datalists
 #!/usr/bin/env python
@@ -15,7 +15,7 @@ class Display():
     w4=Label()
     w5=Label()
     w6=Label()
-    labels=[w1,w2,w3,w4,w5,w6]
+    labels={"cabintemp":w1,"motortemp":w2,"batterytemp":w3,"motorrpm":w4,"solarvolt":w5,"batvolt":w6}
     UPDATESPEED_MS=100
     batteryX1=0
     batteryX2=0
@@ -24,8 +24,8 @@ class Display():
     height=0
 
     def quit(self):
-        #self.connector.closeall()
-        #print "connector"
+        self.connector.closeall()
+        print "connector"
         self.master.quit()
         
 
@@ -39,12 +39,9 @@ class Display():
 
     def update(self):
 
-        x=0
-        values=self.datalist.data.values()
-        #print values
-        for i in values:
-            self.labels[x].config(text=str(i)+self.datalist.dataunits[i])
-            x=x+1
+        keys=self.datalist.data.keys()
+        for i in keys:
+            self.labels[i].config(text=str(self.datalist.data[i])+self.datalist.dataunits[i])
         self.batterydisplay.delete("level")
 
         color="GREEN"
@@ -68,13 +65,13 @@ class Display():
 
     def __init__(self):
         print('starting')
-        WIDTH=700
-        HEIGHT=300
+        WIDTH=600
+        HEIGHT=350
         
         self.datalist=Datalists()
-        #self.connector=Connector(self.datalist)
+        self.connector=Connector(self.datalist)
         self.master = Tk()
-        self.master.geometry(str(WIDTH)+"x"+str(HEIGHT+25)+"+600+200")
+        self.master.geometry(str(WIDTH)+"x"+str(HEIGHT+25))
         self.master.title("SCSC Racing Telemetry")
 
 
@@ -109,38 +106,38 @@ class Display():
         w1_label = Label(statsframe, text="Cabin Temperature:", anchor=W, wraplength=WIDTH/7,bg="ORANGE", justify=LEFT,
                          font=("Helvetica", 10), padx=10)
         w1_label.grid(row=0)
-        self.labels[0] = Label(statsframe, text="0"+str(self.datalist.dataunits[0]), anchor=W,bg="ORANGE", font=("Helvetica", 16))
-        self.labels[0].grid(row=0,column=1)
+        self.labels["cabintemp"] = Label(statsframe, text="0"+str(self.datalist.dataunits["cabintemp"]), anchor=W,bg="ORANGE", font=("Helvetica", 16))
+        self.labels["cabintemp"].grid(row=0,column=1)
 
         w2_label = Label(statsframe, text="Motor Temperature:", anchor=W, wraplength=WIDTH/7,bg="ORANGE", justify=LEFT,
                          font=("Helvetica", 10), padx=10)
         w2_label.grid(row=1)
-        self.labels[1] = Label(statsframe, text="0"+str(self.datalist.dataunits[1]), anchor=W,bg="ORANGE", font=("Helvetica", 16))
-        self.labels[1].grid(row=1,column=1)
+        self.labels["motortemp"] = Label(statsframe, text="0"+str(self.datalist.dataunits["motortemp"]), anchor=W,bg="ORANGE", font=("Helvetica", 16))
+        self.labels["motortemp"].grid(row=1,column=1)
 
         w3_label = Label(statsframe, text="Battery Temperature:", anchor=W, wraplength=WIDTH/7,bg="ORANGE", justify=LEFT,
                          font=("Helvetica", 10), padx=10)
         w3_label.grid(row=1, column=2)
-        self.labels[2] = Label(statsframe, text="0"+str(self.datalist.dataunits[2]), anchor=W,bg="ORANGE", font=("Helvetica", 16))
-        self.labels[2].grid(row=1,column=3)
+        self.labels["batterytemp"] = Label(statsframe, text="0"+str(self.datalist.dataunits["batterytemp"]), anchor=W,bg="ORANGE", font=("Helvetica", 16))
+        self.labels["batterytemp"].grid(row=1,column=3)
 
         w4_label = Label(speedframe, text="Motor RPM:", width=WIDTH/16, anchor=W, bg="RED",
                          font=("Helvetica", 12), padx=10)
         w4_label.grid(row=0, column=0)
-        self.labels[3] = Label(speedframe, text="0"+str(self.datalist.dataunits[3]),width=WIDTH/80,anchor=W,bg="RED", font=("Helvetica", 48), padx=10)
-        self.labels[3].grid(row=1, column=0, sticky=W)
+        self.labels["motorrpm"] = Label(speedframe, text="0"+str(self.datalist.dataunits["motorrpm"]),width=WIDTH/80,anchor=W,bg="RED", font=("Helvetica", 48), padx=10)
+        self.labels["motorrpm"].grid(row=1, column=0, sticky=W)
 
         w5_label = Label(statsframe, text="Solar Panel Voltage:", anchor=W, wraplength=WIDTH/7,bg="ORANGE", justify=LEFT,
                          font=("Helvetica", 10), padx=10)
         w5_label.grid(row=0, column=2)
-        self.labels[4] = Label(statsframe, text="0"+str(self.datalist.dataunits[4]), anchor=W,bg="ORANGE", font=("Helvetica", 16))
-        self.labels[4].grid(row=0,column=3)
+        self.labels["solarvolt"] = Label(statsframe, text="0"+str(self.datalist.dataunits["solarvolt"]), anchor=W,bg="ORANGE", font=("Helvetica", 16))
+        self.labels["solarvolt"].grid(row=0,column=3)
 
         w6_label = Label(batteryframe, text="Battery Voltage:", height=1, width=WIDTH/16, anchor=W, bg="BLUE",
                          font=("Helvetica", 12), padx=10)
         w6_label.grid(row=0, columnspan=2)
-        self.labels[5] = Label(batteryframe, text="0"+str(self.datalist.dataunits[5]), bg="BLUE", font=("Helvetica", 24), pady=HEIGHT/40)
-        self.labels[5].grid(row=1, column=0, sticky=E)
+        self.labels["batvolt"] = Label(batteryframe, text="0"+str(self.datalist.dataunits["batvolt"]), bg="BLUE", font=("Helvetica", 24), pady=HEIGHT/40)
+        self.labels["batvolt"].grid(row=1, column=0, sticky=E)
 
         w7 =Button(buttonframe, text="Connect",width=20, command=self.connect)
         w7.grid(row=0,column=0,sticky=E)

@@ -8,7 +8,7 @@ from SCPiDisplay import *
 from Datalists import Datalists
 
 class Connector:
-    HOST='10.120.57.167'
+    HOST='207.151.60.219'
     PORT=13000
     message=''
     keepsampling=True
@@ -23,13 +23,12 @@ class Connector:
     last_read = [0]*len(potentiometer_adc)       # this keeps track of the last potentiometer value
     set_value=[0]*len(potentiometer_adc)
     return_value=[0]*len(potentiometer_adc)
-    value_names=("cabintemp","motortemp","batterytemp","motorrpm","solarvolt","batvolt")
+    value_names=("cabintemp","batvolt","batterytemp","motorrpm","solarvolt","motortemp")
     pot_adjust=[0]*len(potentiometer_adc)
     tolerance = 10
     ftemp=0
-    SAMPLESPEED_S=0.066
+    SAMPLESPEED_S=0.033
     TIMEOUT=15
-    
     #should move this somewhere else
 
 
@@ -109,7 +108,6 @@ class Connector:
     def updateData(self):
         #print self.datalist.data.values() 
         for i in range(0, len(self.return_value)):
-            
             self.datalist.data[self.value_names[i]]=int(self.return_value[i])
         pass
 
@@ -126,13 +124,10 @@ class Connector:
                 break
 
             if(polling=="poll"):
-                for x in range(0,len(self.value_names)):
-                    if(x<len(self.return_value)):
-                        message=message+ str(self.value_names[x])+':'+str(self.return_value[x])+';'
-                    else:
-                        message=message+ str(self.value_names[x])+':0;'
+                for x in self.value_names:
+                    message=message+x+':'+str(self.datalist.data[x])+';'
                 message=message[:-1]
-                #print message
+                print message
                 if(failedAttempts>=100):
                     self.closeserv()
                     break
@@ -141,7 +136,6 @@ class Connector:
                 except:
                     print('sending data failed.')
                     failedAttempts+=1
-                #time.sleep(self.TRANSMITSPEED_S)
 
 
     # read SPI data from MCP3008 chip, 8 possible adc's (0 thru 7)

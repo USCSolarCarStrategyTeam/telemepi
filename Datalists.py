@@ -11,5 +11,11 @@ class Datalists:
             'solarvolt': 0,
             'batvolt': 0
           }
-        self.dataunits=[' °F',' °F',' °F',' rpm',' V',' V']
+        self.dataunits={'cabintemp': ' °F',
+            'motortemp': ' °F',
+            'batterytemp': ' °F',
+            'motorrpm': ' rpm',
+            'solarvolt': ' V',
+            'batvolt': ' V'
+          }
         pass
