@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 class Datalists:
     
     def __init__(self):
@@ -8,4 +11,5 @@ class Datalists:
             'solarvolt': 0,
             'batvolt': 0
           }
+        self.dataunits=[' °F',' °F',' °F',' rpm',' V',' V']
         pass
