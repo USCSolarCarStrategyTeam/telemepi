@@ -3,6 +3,7 @@ __author__ = 'YutongGu'
 from PiConnector import *
 from Tkinter import *
 from Datalists import Datalists
+import datetime
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
@@ -15,6 +16,7 @@ class Display():
     w4=Label()
     w5=Label()
     w6=Label()
+    timeLabel=Label()
     labels={"cabintemp":w1,"motortemp":w2,"batterytemp":w3,"motorrpm":w4,"solarvolt":w5,"batvolt":w6}
     UPDATESPEED_MS=100
     batteryX1=0
@@ -22,6 +24,7 @@ class Display():
     batteryY1=0
     batteryY2=0
     height=0
+    chargedrainratio=0.5
 
     def quit(self):
         self.connector.closeall()
@@ -30,6 +33,7 @@ class Display():
         
 
     def connect(self):
+
         if(self.connector.connected==False):
             print('Trying to connect')
             self.connector.startclient()
@@ -38,28 +42,47 @@ class Display():
         pass
 
     def update(self):
+        localtime=datetime.datetime.now().strftime('%H:%M')
+        self.timeLabel.config(text=localtime)
 
         keys=self.datalist.data.keys()
         for i in keys:
             self.labels[i].config(text=str(self.datalist.data[i])+self.datalist.dataunits[i])
         self.batterydisplay.delete("level")
+        self.chargedisplay.delete("level")
 
-        color="GREEN"
+        #updating chargedischargeratio (will eventually change for more accurate model)
+        total=self.datalist.data["solarvolt"]+self.datalist.data["motorrpm"]
+        if(total==0):
+            self.chargedrainratio=0.5
+        else:
+             self.chargedrainratio=(self.datalist.data["solarvolt"]*1.0/(total))
+
+        ccolor="GREEN"
+        if(self.chargedischargeratio<-0.2):
+            ccolor="RED"
+        elif(self.chargedischargeratio<0.2):
+            ccolor="YELLOW"
+
+        bcolor="GREEN"
         if(self.datalist.data["batvolt"]<15):
-            color="RED"
+            bcolor="RED"
         elif(self.datalist.data["batvolt"]<40):
-            color="YELLOW"
+            bcolor="YELLOW"
 
-        self.batterydisplay.create_rectangle(self.batteryX1, (self.batteryY2-(self.height*self.datalist.data["batvolt"]/100)), self.batteryX2, self.batteryY2,fill=color, tag="level")
+        self.batterydisplay.create_rectangle(self.batteryX1, (self.batteryY2-(self.height*self.datalist.data["batvolt"]/100)), self.batteryX2, self.batteryY2,fill=bcolor, tag="level")
+        self.chargedisplay.create_rectangle(5, 7, (self.chargedisplay.winfo_reqwidth()-10)*self.chargedrainratio+5, self.chargedisplay.winfo_reqheight()-7, fill=ccolor, width=2, tag="level")
         self.master.after(self.UPDATESPEED_MS, self.update)
         pass
                 
     def disconnect(self):
+
         if(self.connector.connected==True):
             print("Trying to close")
             self.connector.closeserv()
         else:
             print("Already closed")
+
         pass
         #App.stop()
 
@@ -76,7 +99,7 @@ class Display():
 
 
         timeframe=Frame(self.master, height=25, width=WIDTH, bg="YELLOW")
-        timeframe.grid_propagate(0)
+        timeframe.pack_propagate(0)
         timeframe.grid(row=0, columnspan=3)
 
         speedframe=Frame(self.master, height=2*HEIGHT/5, width=WIDTH/2, bg="RED")
@@ -103,56 +126,69 @@ class Display():
         buttonframe.grid_propagate(0)
         buttonframe.grid(row=4, columnspan=3)
 
-        w1_label = Label(statsframe, text="Cabin Temperature:", anchor=W, wraplength=WIDTH/7,bg="ORANGE", justify=LEFT,
-                         font=("Helvetica", 10), padx=10)
-        w1_label.grid(row=0)
+        label = Label(statsframe, text="Cabin Temperature:", anchor=W, wraplength=WIDTH/7,bg="ORANGE", justify=LEFT,
+                         font=("Helvetica", 9, "bold"), padx=10)
+        label.grid(row=0)
         self.labels["cabintemp"] = Label(statsframe, text="0"+str(self.datalist.dataunits["cabintemp"]), anchor=W,bg="ORANGE", font=("Helvetica", 16))
         self.labels["cabintemp"].grid(row=0,column=1)
 
-        w2_label = Label(statsframe, text="Motor Temperature:", anchor=W, wraplength=WIDTH/7,bg="ORANGE", justify=LEFT,
-                         font=("Helvetica", 10), padx=10)
-        w2_label.grid(row=1)
+        label = Label(statsframe, text="Motor Temperature:", anchor=W, wraplength=WIDTH/7,bg="ORANGE", justify=LEFT,
+                         font=("Helvetica", 9, "bold"), padx=10)
+        label.grid(row=1)
         self.labels["motortemp"] = Label(statsframe, text="0"+str(self.datalist.dataunits["motortemp"]), anchor=W,bg="ORANGE", font=("Helvetica", 16))
         self.labels["motortemp"].grid(row=1,column=1)
 
-        w3_label = Label(statsframe, text="Battery Temperature:", anchor=W, wraplength=WIDTH/7,bg="ORANGE", justify=LEFT,
-                         font=("Helvetica", 10), padx=10)
-        w3_label.grid(row=1, column=2)
+        label = Label(statsframe, text="Battery Temperature:", anchor=W, wraplength=WIDTH/7,bg="ORANGE", justify=LEFT,
+                         font=("Helvetica", 9, "bold"), padx=10)
+        label.grid(row=1, column=2)
         self.labels["batterytemp"] = Label(statsframe, text="0"+str(self.datalist.dataunits["batterytemp"]), anchor=W,bg="ORANGE", font=("Helvetica", 16))
         self.labels["batterytemp"].grid(row=1,column=3)
 
-        w4_label = Label(speedframe, text="Motor RPM:", width=WIDTH/16, anchor=W, bg="RED",
-                         font=("Helvetica", 12), padx=10)
-        w4_label.grid(row=0, column=0)
+        label = Label(speedframe, text="Motor RPM:", width=WIDTH/16, anchor=W, bg="RED",
+                         font=("Helvetica", 12, "bold"), padx=10)
+        label.grid(row=0, column=0)
         self.labels["motorrpm"] = Label(speedframe, text="0"+str(self.datalist.dataunits["motorrpm"]),width=WIDTH/80,anchor=W,bg="RED", font=("Helvetica", 48), padx=10)
         self.labels["motorrpm"].grid(row=1, column=0, sticky=W)
 
-        w5_label = Label(statsframe, text="Solar Panel Voltage:", anchor=W, wraplength=WIDTH/7,bg="ORANGE", justify=LEFT,
-                         font=("Helvetica", 10), padx=10)
-        w5_label.grid(row=0, column=2)
+        label = Label(statsframe, text="Solar Panel Voltage:", anchor=W, wraplength=WIDTH/7,bg="ORANGE", justify=LEFT,
+                         font=("Helvetica", 9, "bold"), padx=10)
+        label.grid(row=0, column=2)
         self.labels["solarvolt"] = Label(statsframe, text="0"+str(self.datalist.dataunits["solarvolt"]), anchor=W,bg="ORANGE", font=("Helvetica", 16))
         self.labels["solarvolt"].grid(row=0,column=3)
 
-        w6_label = Label(batteryframe, text="Battery Voltage:", height=1, width=WIDTH/16, anchor=W, bg="BLUE",
-                         font=("Helvetica", 12), padx=10)
-        w6_label.grid(row=0, columnspan=2)
+        label = Label(batteryframe, text="Battery Voltage:", height=1, width=WIDTH/16, anchor=W, bg="BLUE",
+                         font=("Helvetica", 12, "bold"), padx=10)
+        label.grid(row=0, columnspan=2)
         self.labels["batvolt"] = Label(batteryframe, text="0"+str(self.datalist.dataunits["batvolt"]), bg="BLUE", font=("Helvetica", 24), pady=HEIGHT/40)
         self.labels["batvolt"].grid(row=1, column=0, sticky=E)
 
-        w7 =Button(buttonframe, text="Connect",width=20, command=self.connect)
-        w7.grid(row=0,column=0,sticky=E)
-        w8 =Button(buttonframe, text="Disconnect",width=20, command=self.disconnect)
-        w8.grid(row=0,column=1,sticky=W)
+        localtime=datetime.datetime.now().strftime('%H:%M')
+        self.timeLabel=Label(timeframe, text=localtime, bg="YELLOW", font=("Helvetica", 12, "bold"), anchor=E, padx=10);
+        self.timeLabel.pack(side=RIGHT )
+
+        w1 =Button(buttonframe, text="Connect",width=20, command=self.connect)
+        w1.grid(row=0,column=0,sticky=E)
+        w2 =Button(buttonframe, text="Disconnect",width=20, command=self.disconnect)
+        w2.grid(row=0,column=1,sticky=W)
 
         self.batterydisplay=Canvas(batteryframe, bg="BLUE", highlightthickness=0, width=batteryframe.winfo_reqwidth()/2, height=batteryframe.winfo_reqheight()-25)
-        self.batteryX2=3*self.batterydisplay.winfo_reqwidth()/4
-        self.batteryY2=7*self.batterydisplay.winfo_reqheight()/8
         self.batteryX1=self.batterydisplay.winfo_reqwidth()/4
         self.batteryY1=self.batterydisplay.winfo_reqheight()/8
+        self.batteryX2=3*self.batterydisplay.winfo_reqwidth()/4
+        self.batteryY2=7*self.batterydisplay.winfo_reqheight()/8
         self.height=self.batteryY2-self.batteryY1
         self.batterydisplay.create_rectangle(self.batteryX1, self.batteryY1, self.batteryX2, self.batteryY2, outline="BLACK", width=2)
         self.batterydisplay.create_rectangle(self.batteryX1, (self.batteryY2-(self.height*self.datalist.data["batvolt"]/100)), self.batteryX2, self.batteryY2,fill="GREEN", tag="level")
         self.batterydisplay.grid(row=1,column=1)
+
+        label= Label(chargeframe, text="Charging meter:", font=("Helvetica", 12, "bold"), anchor=W, bg="MAGENTA", justify=LEFT, padx=10)
+        label.grid(row=0, column=0)
+        self.chargedisplay=Canvas(chargeframe, bg="MAGENTA", highlightthickness=0, width=chargeframe.winfo_reqwidth()*3/4, height=chargeframe.winfo_reqheight())
+        self.chargedisplay.grid(row=0, column=1)
+        self.chargedisplay.create_rectangle(5,7,self.chargedisplay.winfo_reqwidth()-5,self.chargedisplay.winfo_reqheight()-7, width=2)
+        self.chargedisplay.create_line(self.chargedisplay.winfo_reqwidth()/2,7, self.chargedisplay.winfo_reqwidth()/2,0, width=2)
+        self.chargedisplay.create_rectangle(5, 7, (self.chargedisplay.winfo_reqwidth()-10)*self.chargedrainratio+5, self.chargedisplay.winfo_reqheight()-7, fill="YELLOW", width=2, tag="level")
+
 
         buttonframe.grid_columnconfigure(0, weight=1)
         buttonframe.grid_columnconfigure(1, weight=1)
@@ -167,7 +203,7 @@ class Display():
         batteryframe.grid_columnconfigure(0, weight=1)
         batteryframe.grid_columnconfigure(1, weight=1)
 
-        self.update()
+        #self.update()
         self.master.protocol("WM_DELETE_WINDOW", self.quit)
         self.master.mainloop()
 
