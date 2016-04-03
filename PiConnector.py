@@ -27,7 +27,7 @@ class Connector:
     pot_adjust=[0]*len(potentiometer_adc)
     tolerance = 10
     ftemp=0
-    SAMPLESPEED_S=0.033
+    SAMPLESPEED_S=0.01
     TIMEOUT=15
     #should move this somewhere else
 
