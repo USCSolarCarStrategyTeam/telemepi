@@ -8,7 +8,7 @@ from SCPiDisplay import *
 from Datalists import Datalists
 
 class Connector:
-    HOST='207.151.60.219'
+    HOST='10.120.60.40'
     PORT=13000
     message=''
     keepsampling=True
@@ -23,7 +23,7 @@ class Connector:
     last_read = [0]*len(potentiometer_adc)       # this keeps track of the last potentiometer value
     set_value=[0]*len(potentiometer_adc)
     return_value=[0]*len(potentiometer_adc)
-    value_names=("cabintemp","batvolt","batterytemp","motorrpm","solarvolt","motortemp")
+    value_names=("motorrpm","solarvolt","batvolt","batterytemp","cabintemp","motortemp")
     pot_adjust=[0]*len(potentiometer_adc)
     tolerance = 10
     ftemp=0
@@ -127,7 +127,7 @@ class Connector:
                 for x in self.value_names:
                     message=message+x+':'+str(self.datalist.data[x])+';'
                 message=message[:-1]
-                print message
+                print message;
                 if(failedAttempts>=100):
                     self.closeserv()
                     break

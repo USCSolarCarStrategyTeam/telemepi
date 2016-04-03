@@ -59,9 +59,9 @@ class Display():
              self.chargedrainratio=(self.datalist.data["solarvolt"]*1.0/(total))
 
         ccolor="GREEN"
-        if(self.chargedischargeratio<-0.2):
+        if(self.chargedrainratio<0.4):
             ccolor="RED"
-        elif(self.chargedischargeratio<0.2):
+        elif(self.chargedrainratio<0.6):
             ccolor="YELLOW"
 
         bcolor="GREEN"
@@ -203,7 +203,7 @@ class Display():
         batteryframe.grid_columnconfigure(0, weight=1)
         batteryframe.grid_columnconfigure(1, weight=1)
 
-        #self.update()
+        self.update()
         self.master.protocol("WM_DELETE_WINDOW", self.quit)
         self.master.mainloop()
 
