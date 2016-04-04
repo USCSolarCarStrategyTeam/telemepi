@@ -16,9 +16,9 @@ class Connector:
     SPICLK = 18
     SPIMISO = 23
     SPIMOSI = 24
-    SPICS = 25
+    SPICS = [25,4]
     input=''
-    potentiometer_adc = [0, 1, 2, 3]
+    potentiometer_adc = [0, 1, 2, 8] #will be modulused
     trim_pot=[0]*len(potentiometer_adc)
     last_read = [0]*len(potentiometer_adc)       # this keeps track of the last potentiometer value
     set_value=[0]*len(potentiometer_adc)
@@ -39,7 +39,8 @@ class Connector:
         GPIO.setup(self.SPIMOSI, GPIO.OUT)
         GPIO.setup(self.SPIMISO, GPIO.IN)
         GPIO.setup(self.SPICLK, GPIO.OUT)
-        GPIO.setup(self.SPICS, GPIO.OUT)
+        GPIO.setup(self.SPICS[0], GPIO.OUT)
+        GPIO.setup(self.SPICS[1], GPIO.OUT)
                # to keep from being jittery we'll only change
                             # volume when the pot has moved more than 5 'counts'
         try:
@@ -87,8 +88,9 @@ class Connector:
         while self.keepsampling:
             # read the analog pin
             #print('sampling')
+            
             for x in range(0, len(self.potentiometer_adc)):
-                self.trim_pot[x] = self.readadc(self.potentiometer_adc[x], self.SPICLK, self.SPIMOSI, self.SPIMISO, self.SPICS)
+                self.trim_pot[x] = self.readadc(self.potentiometer_adc[x]%8, self.SPICLK, self.SPIMOSI, self.SPIMISO, self.SPICS[self.potentiometer_adc[x]/8])
                 
                 # how much has it changed since the last read?
                 self.pot_adjust[x] = abs(self.trim_pot[x] - self.last_read[x])
@@ -138,7 +140,7 @@ class Connector:
                     failedAttempts+=1
 
 
-    # read SPI data from MCP3008 chip, 8 possible adc's (0 thru 7)
+    # read SPI data from MCP3008 chip, 8 possible pins (0 thru 7)
     def readadc(self, adcnum, clockpin, mosipin, misopin, cspin):
             if ((adcnum > 7) or (adcnum < 0)):
                     return -1
