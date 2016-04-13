@@ -3,7 +3,7 @@ __author__ = 'YutongGu'
 from PiConnector import *
 from Tkinter import *
 from Datalists import Datalists
-######from PiReader import valueReader
+from PiReader import valueReader
 import datetime
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
@@ -38,7 +38,7 @@ class Display():
 
     def quit(self):
         self.connector.closeall()
-        ######self.reader.quit()
+        self.reader.quit()
         print "connector"
         self.master.quit()
         
@@ -61,7 +61,6 @@ class Display():
             print("Already closed")
 
         pass
-        #App.stop()
 
     def update(self):
         localtime=datetime.datetime.now().strftime('%H:%M')
@@ -70,10 +69,10 @@ class Display():
         keys=self.datalist.data.keys()
         for i in keys:
             color=WARN
+            value=self.datalist.data[i]
             if(i=="motorrpm" or i=="batvolt"):
                 self.labels[i].config(text=str(value)+self.datalist.dataunits[i])
                 continue
-            value=self.datalist.data[i]
             if(value<self.datalist.databounds[i][0]):
                 color=self.datalist.datarules[i][0]
             elif(value<self.datalist.databounds[i][1]):
@@ -124,7 +123,7 @@ class Display():
         
         self.datalist=Datalists()
         self.connector=Connector(self.datalist)
-        ########self.reader=valueReader(self.datalist)
+        self.reader=valueReader(self.datalist)
         self.master = Tk()
         self.master.geometry(str(WIDTH)+"x"+str(HEIGHT+25))
         self.master.title("SCSC Racing Telemetry")
@@ -198,12 +197,10 @@ class Display():
         self.timeLabel=Label(timeframe, text=localtime, bg=FILL1, font=("Helvetica", 12, "bold"), anchor=E, padx=10)
         self.timeLabel.pack(side=RIGHT )
 
-        #######w1 =Button(buttonframe, text="Connect",width=20, command=self.connect)
-        w1 =Button(buttonframe, text="Connect",width=20)
-        w1.grid(row=0,column=0,sticky=E)
-        #######w2 =Button(buttonframe, text="Disconnect",width=20, command=self.disconnect)
-        w2 =Button(buttonframe, text="Disconnect",width=20)
-        w2.grid(row=0,column=1,sticky=W)
+        b1 =Button(buttonframe, text="Connect",width=20, command=self.connect)
+        b1.grid(row=0,column=0,sticky=E)
+        b2 =Button(buttonframe, text="Disconnect",width=20, command=self.disconnect)
+        b2.grid(row=0,column=1,sticky=W)
 
         self.batterydisplay=Canvas(batteryframe, bg=FILL4, highlightthickness=0, width=batteryframe.winfo_reqwidth()/2, height=batteryframe.winfo_reqheight()-25) #blue-ish
         self.batteryX1=self.batterydisplay.winfo_reqwidth()/4

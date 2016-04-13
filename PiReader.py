@@ -18,7 +18,7 @@ class valueReader:
     last_read = [0]*len(potentiometer_adc)       # this keeps track of the last potentiometer value
     set_value=[0]*len(potentiometer_adc)
     return_value=[0]*len(potentiometer_adc)
-    value_names=("motorrpm","solarvolt","batvolt","batterytemp","cabintemp","motortemp")
+    
     pot_adjust=[0]*len(potentiometer_adc)
 
     def __init__(self, data):
@@ -60,8 +60,9 @@ class valueReader:
 
     def updateData(self):
         #print self.datalist.data.values()
+        
         for i in range(0, len(self.return_value)):
-            self.datalist.data[self.value_names[i]]=int(self.return_value[i])
+            self.datalist.data[self.datalist.value_names[i]]=int(self.return_value[i])
         pass
 
      # read SPI data from MCP3008 chip, 8 possible pins (0 thru 7)

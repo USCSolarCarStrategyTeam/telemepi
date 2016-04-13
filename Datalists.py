@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-BAD="#ff9980"
-WARN1="#ffbf80"
-WARN2="#ffffb3"
-WARN3="#c6ff1a"
 GOOD="#33cc33"
+WARN3="#ffbf80"
+WARN2="#ffffb3"
+WARN1="#c6ff1a"
+BAD="#ff9980"
 DESCENDING=[GOOD,WARN1,WARN2,WARN3,BAD]
 ASCENDING=[BAD,WARN3,WARN2,WARN1,GOOD]
 VALLEY=[GOOD,WARN2,BAD,WARN2,GOOD]
@@ -36,4 +36,5 @@ class Datalists:
             'batterytemp': DESCENDING,
             'solarvolt': ASCENDING
           }
+        self.value_names=("motorrpm","solarvolt","batvolt","batterytemp","cabintemp","motortemp")
         pass

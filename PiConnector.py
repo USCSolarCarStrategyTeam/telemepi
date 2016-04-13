@@ -5,7 +5,7 @@ import threading
 from SCPiDisplay import *
 
 class Connector:
-    HOST='10.120.60.40'
+    HOST='10.120.52.188'
     PORT=13000
     message=''
     connected=False
@@ -18,7 +18,7 @@ class Connector:
     def __init__(self, data):
         # set up the SPI interface pins
         self.datalist=data
-
+        self.connected=False;
         pass
 
         # 10k trim pot connected to adc #0
@@ -60,10 +60,10 @@ class Connector:
                 break
 
             if(polling=="poll"):
-                for x in self.value_names:
+                for x in self.datalist.value_names:
                     message=message+x+':'+str(self.datalist.data[x])+';'
                 message=message[:-1]
-                print message
+                #print message
                 if(failedAttempts>=100):
                     self.closeserv()
                     break
