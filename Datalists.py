@@ -14,9 +14,9 @@ class Datalists:
     def __init__(self):
         self.data={'cabintemp': 0,
             'motortemp': 0,
-            'batterytemp': 0,
-            'motorrpm':0,
-            'solarvolt': 0,
+            'batterytemp': 50,
+            'motorrpm':10,
+            'solarvolt': 20,
             'batvolt': 0
           }
         self.dataunits={'cabintemp': ' °F',

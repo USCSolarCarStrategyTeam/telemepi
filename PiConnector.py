@@ -3,41 +3,59 @@ __author__ = 'YutongGu'
 import socket
 import threading
 from SCPiDisplay import *
+import time
 
 class Connector:
-    HOST='10.120.52.188'
+    HOST='localhost'
     PORT=13000
     message=''
     connected=False
     input=''
     TIMEOUT=15
     sock=object
+    quit=False
     #should move this somewhere else
 
 
     def __init__(self, data):
         # set up the SPI interface pins
         self.datalist=data
-        self.connected=False;
+        try:
+            thread1 = threading.Thread(target=self.startclient, args=())
+            thread1.daemon = True
+            thread1.start()
+        except:
+            print('failed to thread startclient')
         pass
 
         # 10k trim pot connected to adc #0
 
     def startclient(self):
         #set up socket
+        print "starting client"
+
+        while(self.connected==False and ~self.quit):
+            time.sleep(5)
+            print "Setting up socket"
+            try:
+                #create an AF_INET, STREAM socket (TCP)
+                self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.sock.settimeout(self.TIMEOUT)
+            except:
+                print 'Failed to create socket'
+            self.connect()
+
+
+    def connect(self):
         try:
-            #create an AF_INET, STREAM socket (TCP)
-            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.sock.settimeout(self.TIMEOUT)
-        except:
-            print 'Failed to create socket'
-        try:
+            print('trying to connect')
             self.sock.connect((self.HOST,self.PORT))
             self.connected=True
             print('connection established')
         except:
-            print('connection cannot be established')
-            
+            self.sock.close()
+            self.sock=None
+            print('connect failed')
             pass
 
         try:
@@ -49,8 +67,8 @@ class Connector:
 
     def transmitData(self):
         failedAttempts=0
-        
-        while self.connected:
+
+        while (self.connected and ~self.quit):
             message=""
             try:
                 polling=self.sock.recv(16)
@@ -58,12 +76,17 @@ class Connector:
                 print("Connection timed out. Disconnected")
                 self.closeserv()
                 break
+            except socket.error:
+                if ~self.quit:
+                    pass
+                print"error"
+                self.closeserv()
+                continue
 
             if(polling=="poll"):
                 for x in self.datalist.value_names:
                     message=message+x+':'+str(self.datalist.data[x])+';'
                 message=message[:-1]
-                #print message
                 if(failedAttempts>=100):
                     self.closeserv()
                     break
@@ -81,10 +104,20 @@ class Connector:
                 print 'connection already closed'
             self.sock.close()
             self.connected=False
+            print "connected set to false***"
+            if ~self.quit:
+                print "starting client from closeserv"
+                self.startclient()
 
     def closeall(self):
-        self.closeserv()
-        self.keepsampling=False
+        try:
+            self.sock.sendall("quit")
+        except:
+            print 'couldnt communicate to telemetry'
+        self.quit = True
+        print "quit set to true***"
+        if(self.sock!=None):
+            self.sock.close()
 
     # change these as desired - they're the pins connected from the
     # SPI port on the ADC to the Cobbler
