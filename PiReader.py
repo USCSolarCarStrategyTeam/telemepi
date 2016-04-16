@@ -37,6 +37,12 @@ class valueReader:
         except:
             print 'failed to thread sample'
 
+    def __del__(self):
+        if(self.keepsampling==True):
+            print "PiReader deconstructed"
+            self.quit()
+        pass
+
     def sample(self):
 
         while self.keepsampling:

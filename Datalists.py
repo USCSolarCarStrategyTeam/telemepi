@@ -38,3 +38,10 @@ class Datalists:
           }
         self.value_names=("motorrpm","solarvolt","batvolt","batterytemp","cabintemp","motortemp")
         pass
+
+    def getdatastring(self):
+        message=""
+        for x in self.value_names:
+            message=message+x+':'+str(self.data[x])+' \t '
+            message=message[:-1]
+        return message

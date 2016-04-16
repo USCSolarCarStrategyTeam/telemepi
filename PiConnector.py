@@ -29,6 +29,11 @@ class Connector:
         pass
 
         # 10k trim pot connected to adc #0
+    def __del__(self):
+        if(self.quit!=True):
+            print "PiConnector deconstructed"
+            self.closeall()
+        pass
 
     def startclient(self):
         #set up socket
@@ -36,7 +41,7 @@ class Connector:
 
         while(self.connected==False and ~self.quit):
             time.sleep(5)
-            print "Setting up socket"
+            print "****************Setting up socket*******************"
             try:
                 #create an AF_INET, STREAM socket (TCP)
                 self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -48,14 +53,14 @@ class Connector:
 
     def connect(self):
         try:
-            print('trying to connect')
+            print('****************Trying to connect*******************')
             self.sock.connect((self.HOST,self.PORT))
             self.connected=True
-            print('connection established')
+            print('***************Connection established***************')
         except:
             self.sock.close()
             self.sock=None
-            print('connect failed')
+            print('***************Connection failed********************')
             pass
 
         try:
@@ -80,8 +85,13 @@ class Connector:
                 if ~self.quit:
                     pass
                 print"error"
-                self.closeserv()
-                continue
+                try:
+                    thread3 = threading.Thread(target=self.closeserv, args=())
+                    thread3.daemon = True
+                    thread3.start()
+                except:
+                    print('failed to thread closeserv')
+                break
 
             if(polling=="poll"):
                 for x in self.datalist.value_names:
