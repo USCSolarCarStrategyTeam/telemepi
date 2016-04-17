@@ -3,7 +3,7 @@ __author__ = 'YutongGu'
 from PiConnector import *
 from Tkinter import *
 from Datalists import Datalists
-####from PiReader import valueReader
+from PiReader import valueReader
 import datetime
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
@@ -38,7 +38,7 @@ class Display():
 
     def quit(self):
         self.connector.closeall()
-        ####self.reader.quit()
+        self.reader.quit()
         print "connector"
         self.master.quit()
         
@@ -123,7 +123,7 @@ class Display():
         
         self.datalist=Datalists()
         self.connector=Connector(self.datalist)
-        ####self.reader=valueReader(self.datalist)
+        self.reader=valueReader(self.datalist)
         self.master = Tk()
         self.master.geometry(str(WIDTH)+"x"+str(HEIGHT+25))
         self.master.title("SCSC Racing Telemetry")
