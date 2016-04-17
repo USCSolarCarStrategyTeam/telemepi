@@ -2,11 +2,10 @@ __author__ = 'YutongGu'
 
 import socket
 import threading
-from SCPiDisplay import *
 import time
 
 class Connector:
-    HOST='localhost'
+    HOST='10.120.62.21'
     PORT=13000
     message=''
     connected=False
