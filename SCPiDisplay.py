@@ -35,6 +35,7 @@ class Display():
     batteryY2=0
     height=0
     chargedrainratio=0.5
+    first=0
 
     def quit(self):
         self.connector.closeall()
@@ -109,9 +110,9 @@ class Display():
         elif(self.datalist.data["batvolt"]<40):
             color=WARN
         self.batterydisplay.create_rectangle(self.batteryX1, (self.batteryY2-(self.height*self.datalist.data["batvolt"]/100)), self.batteryX2, self.batteryY2,fill=color, tag="level")
-
-
-
+        if(self.first<2):
+            self.master.lift()
+            self.first+=1
         self.master.after(self.UPDATESPEED_MS, self.update)
         pass
                 
@@ -125,6 +126,7 @@ class Display():
         self.connector=Connector(self.datalist)
         self.reader=valueReader(self.datalist)
         self.master = Tk()
+
         self.master.geometry(str(WIDTH)+"x"+str(HEIGHT+25))
         self.master.title("SCSC Racing Telemetry")
 
@@ -232,7 +234,6 @@ class Display():
         speedframe.grid_rowconfigure(1, weight=7)
         batteryframe.grid_columnconfigure(0, weight=1)
         batteryframe.grid_columnconfigure(1, weight=1)
-
         self.update()
         self.master.protocol("WM_DELETE_WINDOW", self.quit)
         self.master.mainloop()

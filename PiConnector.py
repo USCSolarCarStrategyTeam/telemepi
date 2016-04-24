@@ -5,12 +5,12 @@ import threading
 import time
 
 class Connector:
-    HOST='10.120.62.21'
+    HOST='localhost'
     PORT=13000
     message=''
     connected=False
     input=''
-    TIMEOUT=15
+    TIMEOUT=1
     sock=object
     quit=False
     #should move this somewhere else
@@ -39,7 +39,7 @@ class Connector:
         print "starting client"
 
         while(self.connected==False and ~self.quit):
-            time.sleep(5)
+
             print "****************Setting up socket*******************"
             try:
                 #create an AF_INET, STREAM socket (TCP)
@@ -48,6 +48,9 @@ class Connector:
             except:
                 print 'Failed to create socket'
             self.connect()
+            if(self.quit):
+                break
+            time.sleep(10)
 
 
     def connect(self):
@@ -58,6 +61,7 @@ class Connector:
             print('***************Connection established***************')
         except:
             self.sock.close()
+            del(self.sock)
             self.sock=None
             print('***************Connection failed********************')
             pass
