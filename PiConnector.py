@@ -8,7 +8,7 @@ import time
 #will automatically try to connect if disconnected
 #print statements make the code pretty self explanatory
 class Connector:
-    HOST='localhost'
+    HOST='192.168.1.109'
     PORT=13000
     message=''
     connected=False
@@ -18,7 +18,6 @@ class Connector:
     quit=False
 
     def __init__(self, data):
-        # set up the SPI interface pins
         self.datalist = data
         try:
             thread1 = threading.Thread(target=self.startclient, args=())
@@ -28,7 +27,6 @@ class Connector:
             print('failed to thread startclient')
         pass
 
-        # 10k trim pot connected to adc #0
     def __del__(self):
         if ~self.quit:
             print "PiConnector deconstructed"
@@ -83,18 +81,15 @@ class Connector:
                 polling=self.sock.recv(16)
             except socket.timeout:
                 print("Connection timed out. Disconnected")
-                self.closeserv()
+                thread3 = threading.Thread(target=self.closeserv, args=())
+                thread3.daemon = True
+                thread3.start()
                 break
             except socket.error:
-                if ~self.quit:
-                    pass
                 print"error"
-                try:
-                    thread3 = threading.Thread(target=self.closeserv, args=())
-                    thread3.daemon = True
-                    thread3.start()
-                except:
-                    print('failed to thread closeserv')
+                thread3 = threading.Thread(target=self.closeserv, args=())
+                thread3.daemon = True
+                thread3.start()
                 break
 
             if polling == "poll":
@@ -109,7 +104,13 @@ class Connector:
                 except:
                     print('sending data failed.')
                     failedAttempts += 1
-
+            else:
+                print"error"
+                thread3 = threading.Thread(target=self.closeserv, args=())
+                thread3.daemon = True
+                thread3.start()
+                break
+            
     def closeserv(self):
         if self.connected:
             try:
@@ -133,7 +134,5 @@ class Connector:
         if self.sock is not None:
             self.sock.close()
 
-    # change these as desired - they're the pins connected from the
-    # SPI port on the ADC to the Cobbler
 
 
