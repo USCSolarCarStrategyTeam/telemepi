@@ -3,10 +3,11 @@ from PiConnector import *
 from PiReader import *
 from Datalists import *
 
+#just a way to start the program w/out a GUI and all on the terminal
 def main():
-    datalist=Datalists()
-    reader=valueReader(datalist)
-    connector=Connector(datalist)
+    datalist = Datalists()
+    reader = valueReader(datalist)
+    connector = Connector(datalist)
     try:
         while(True):
             print datalist.getdatastring()

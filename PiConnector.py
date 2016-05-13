@@ -4,6 +4,9 @@ import socket
 import threading
 import time
 
+#class is meant for transmitting to a remote computer via sockets over wifi
+#will automatically try to connect if disconnected
+#print statements make the code pretty self explanatory
 class Connector:
     HOST='localhost'
     PORT=13000
@@ -13,12 +16,10 @@ class Connector:
     TIMEOUT=1
     sock=object
     quit=False
-    #should move this somewhere else
-
 
     def __init__(self, data):
         # set up the SPI interface pins
-        self.datalist=data
+        self.datalist = data
         try:
             thread1 = threading.Thread(target=self.startclient, args=())
             thread1.daemon = True
@@ -29,7 +30,7 @@ class Connector:
 
         # 10k trim pot connected to adc #0
     def __del__(self):
-        if(self.quit!=True):
+        if ~self.quit:
             print "PiConnector deconstructed"
             self.closeall()
         pass
@@ -38,7 +39,7 @@ class Connector:
         #set up socket
         print "starting client"
 
-        while(self.connected==False and ~self.quit):
+        while self.connected==False and ~self.quit:
 
             print "****************Setting up socket*******************"
             try:
@@ -48,7 +49,7 @@ class Connector:
             except:
                 print 'Failed to create socket'
             self.connect()
-            if(self.quit):
+            if self.quit:
                 break
             time.sleep(10)
 
@@ -57,11 +58,11 @@ class Connector:
         try:
             print('****************Trying to connect*******************')
             self.sock.connect((self.HOST,self.PORT))
-            self.connected=True
+            self.connected = True
             print('***************Connection established***************')
         except:
             self.sock.close()
-            del(self.sock)
+            del self.sock
             self.sock=None
             print('***************Connection failed********************')
             pass
@@ -76,8 +77,8 @@ class Connector:
     def transmitData(self):
         failedAttempts=0
 
-        while (self.connected and ~self.quit):
-            message=""
+        while self.connected and ~self.quit:
+            message = ""
             try:
                 polling=self.sock.recv(16)
             except socket.timeout:
@@ -96,21 +97,21 @@ class Connector:
                     print('failed to thread closeserv')
                 break
 
-            if(polling=="poll"):
+            if polling == "poll":
                 for x in self.datalist.value_names:
-                    message=message+x+':'+str(self.datalist.data[x])+';'
-                message=message[:-1]
-                if(failedAttempts>=100):
+                    message = message+x+':'+str(self.datalist.data[x])+';'
+                message = message[:-1]
+                if failedAttempts >= 50:
                     self.closeserv()
                     break
                 try:
                     self.sock.sendall(message)
                 except:
                     print('sending data failed.')
-                    failedAttempts+=1
+                    failedAttempts += 1
 
     def closeserv(self):
-        if(self.connected == True):
+        if self.connected:
             try:
                 self.sock.sendall("quit")
             except:
@@ -129,7 +130,7 @@ class Connector:
             print 'couldnt communicate to telemetry'
         self.quit = True
         print "quit set to true***"
-        if(self.sock!=None):
+        if self.sock is not None:
             self.sock.close()
 
     # change these as desired - they're the pins connected from the
