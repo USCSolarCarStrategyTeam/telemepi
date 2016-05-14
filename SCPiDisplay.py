@@ -3,7 +3,7 @@ __author__ = 'YutongGu'
 from PiConnector import *
 from Tkinter import *
 from Datalists import Datalists
-###from PiReader import valueReader
+from PiReader import valueReader
 from PIL import Image, ImageTk
 import datetime
 #!/usr/bin/env python
@@ -43,7 +43,7 @@ class Display():
     #close all sockets, stops reading values and clears GPIO pins before closing program
     def quit(self):
         self.connector.closeall()
-        ###self.reader.quit()
+        self.reader.quit()
         print "Master quit"
         self.master.quit()
 
@@ -140,7 +140,7 @@ class Display():
         #create the datalist, connector, valueReader, and the TK window
         self.datalist = Datalists()
         self.connector = Connector(self.datalist)
-        ###self.reader = valueReader(self.datalist)
+        self.reader = valueReader(self.datalist)
         self.master = Toplevel()
 
         #give the window its dimensions and title
