@@ -8,7 +8,14 @@ import time
 #will automatically try to connect if disconnected
 #print statements make the code pretty self explanatory
 class Connector:
-    HOST=socket.gethostbyname('BabyGu')
+    try:
+    	HOST=socket.gethostbyname('GuLaptop')
+    except:
+	HOST='192.168.1.109'
+
+    #comment this out eventually
+    HOST='192.168.1.109'
+
     PORT=13000
     message=''
     connected=False
@@ -19,6 +26,7 @@ class Connector:
     quit=False
 
     def __init__(self, data):
+	print 'Host ip set as: '+self.HOST
         self.datalist = data
         try:
             thread1 = threading.Thread(target=self.startclient, args=())
