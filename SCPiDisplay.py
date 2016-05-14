@@ -3,7 +3,8 @@ __author__ = 'YutongGu'
 from PiConnector import *
 from Tkinter import *
 from Datalists import Datalists
-from PiReader import valueReader
+###from PiReader import valueReader
+from PIL import Image, ImageTk
 import datetime
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
@@ -25,14 +26,9 @@ GOOD="#33cc33"
 #values will be transmitted from the Connector class in PiConnector
 class Display():
 
-    w1 = Label()
-    w2 = Label()
-    w3 = Label()
-    w4 = Label()
-    w5 = Label()
-    w6 = Label()
     timeLabel = Label()
-    labels = {"cabintemp": w1, "motortemp": w2, "batterytemp": w3, "motorrpm": w4, "solarvolt": w5, "batvolt": w6}
+    labels = {"cabintemp": Label(), "motortemp": Label(), "batterytemp": Label(), "motorrpm": Label(), "solarvolt": Label(), "batvolt": Label(), "connectIcon": Label()}
+    icons = {"connection": PhotoImage()}
     UPDATESPEED_MS = 100
     batteryX1 = 0
     batteryX2 = 0
@@ -41,12 +37,14 @@ class Display():
     height = 0
     chargedrainratio = 0.5
     first = 0
+    WIDTH = 600
+    HEIGHT = 350
 
     #close all sockets, stops reading values and clears GPIO pins before closing program
     def quit(self):
         self.connector.closeall()
-        self.reader.quit()
-        print "connector"
+        ###self.reader.quit()
+        print "Master quit"
         self.master.quit()
 
     #updates the GUI with values from the reader
@@ -104,6 +102,26 @@ class Display():
             color = WARN
         self.batterydisplay.create_rectangle(self.batteryX1, (self.batteryY2-(self.height*self.datalist.data["batvolt"]/100)), self.batteryX2, self.batteryY2,fill=color, tag="level")
 
+        if self.connector.statusChanged:
+            print("Connection status changed")
+            if self.connector.connected:
+                PILimage = Image.open("Images\connected.png")
+                scale_w = self.WIDTH/600.0
+                scale_h = self.HEIGHT/350.0
+                PILimage = PILimage.resize((int(32*scale_w), int(32*scale_h)), Image.ANTIALIAS) #The (250, 250) is (height, width)
+                if PILimage is not None:
+                    self.icons["connection"] = ImageTk.PhotoImage(PILimage)
+                    self.labels["connectIcon"].config(image=self.icons["connection"])
+            else:
+                PILimage = Image.open("Images\disconnected.png")
+                scale_w = self.WIDTH/600.0
+                scale_h = self.HEIGHT/350.0
+                PILimage = PILimage.resize((int(32*scale_w), int(32*scale_h)), Image.ANTIALIAS) #The (250, 250) is (height, width)
+                if PILimage is not None:
+                    self.icons["connection"] = ImageTk.PhotoImage(PILimage)
+                    self.labels["connectIcon"].config(image=self.icons["connection"])
+            self.connector.statusChanged=False
+
         #ensuring that this window is on top
         if self.first < 2:
             self.master.lift()
@@ -117,90 +135,89 @@ class Display():
     def __init__(self):
         print('starting')
         #height and width of window
-        WIDTH = 600
-        HEIGHT = 350
+
 
         #create the datalist, connector, valueReader, and the TK window
         self.datalist = Datalists()
         self.connector = Connector(self.datalist)
-        self.reader = valueReader(self.datalist)
-        self.master = Tk()
+        ###self.reader = valueReader(self.datalist)
+        self.master = Toplevel()
 
         #give the window its dimensions and title
-        self.master.geometry(str(WIDTH)+"x"+str(HEIGHT+25))
+        self.master.geometry(str(self.WIDTH)+"x"+str(self.HEIGHT+25))
         self.master.title("SCSC Racing Telemetry")
 
         #frame for displaying the time
-        timeframe = Frame(self.master, height=25, width=WIDTH, bg=FILL1)
+        timeframe = Frame(self.master, height=25, width=self.WIDTH, bg=FILL1)
         timeframe.pack_propagate(0)
         timeframe.grid(row=0, columnspan=3)
 
         #frame for displaying the speed
-        speedframe=Frame(self.master, height=2*HEIGHT/5, width=WIDTH/2, bg=FILL2)
+        speedframe=Frame(self.master, height=2*self.HEIGHT/5, width=self.WIDTH/2, bg=FILL2)
         speedframe.grid_propagate(0)
         speedframe.grid(row=1, column=0)
 
         #frame for displaying other stats
-        statsframe=Frame(self.master, height=2*HEIGHT/5, width=WIDTH/2, bg=FILL3)
+        statsframe=Frame(self.master, height=2*self.HEIGHT/5, width=self.WIDTH/2, bg=FILL3)
         statsframe.grid_propagate(0)
         statsframe.grid(row=2, column=0)
 
         #frame for displaying battery stats
-        batteryframe=Frame(self.master, height=4*HEIGHT/5, width=3*WIDTH/8, bg=FILL4) #blue-ish
+        batteryframe=Frame(self.master, height=4*self.HEIGHT/5, width=3*self.WIDTH/8, bg=FILL4) #blue-ish
         batteryframe.grid_propagate(0)
         batteryframe.grid(row=1, column=1, rowspan=2)
 
         #frame for warning/error icons
-        errorframe=Frame(self.master, height=4*HEIGHT/5, width=WIDTH/8)
+        errorframe=Frame(self.master, height=4*self.HEIGHT/5, width=self.WIDTH/8)
         errorframe.grid_propagate(0)
         errorframe.grid(row=1, column=2, rowspan=2)
 
         #frame for the charging meter
-        chargeframe=Frame(self.master, height=HEIGHT/10, width=WIDTH, bg=FILL5)
+        chargeframe=Frame(self.master, height=self.HEIGHT/10, width=self.WIDTH, bg=FILL5)
         chargeframe.grid_propagate(0)
         chargeframe.grid(row=3, columnspan=3)
 
         #frame for buttons (if necessary)
-        buttonframe=Frame(self.master, height=HEIGHT/10, width=WIDTH, bg=FILL6)
+        buttonframe=Frame(self.master, height=self.HEIGHT/10, width=self.WIDTH, bg=FILL6)
         buttonframe.grid_propagate(0)
         buttonframe.grid(row=4, columnspan=3)
 
         '''***********************CREATING LABELS WITH VALUES*************************'''
 
-        label = Label(statsframe, text="Cabin Temperature:", anchor=W, wraplength=WIDTH/7,bg=FILL3, justify=LEFT,
+        label = Label(statsframe, text="Cabin Temperature:", anchor=W, wraplength=self.WIDTH/7,bg=FILL3, justify=LEFT,
                          font=("Helvetica", 9, "bold"), padx=10)
         label.grid(row=0)
         self.labels["cabintemp"] = Label(statsframe, text="0"+str(self.datalist.dataunits["cabintemp"]), anchor=W,bg=FILL3, font=("Helvetica", 16))
         self.labels["cabintemp"].grid(row=0,column=1)
 
-        label = Label(statsframe, text="Motor Temperature:", anchor=W, wraplength=WIDTH/7,bg=FILL3, justify=LEFT,
+        label = Label(statsframe, text="Motor Temperature:", anchor=W, wraplength=self.WIDTH/7,bg=FILL3, justify=LEFT,
                          font=("Helvetica", 9, "bold"), padx=10)
         label.grid(row=1)
         self.labels["motortemp"] = Label(statsframe, text="0"+str(self.datalist.dataunits["motortemp"]), anchor=W,bg=FILL3, font=("Helvetica", 16))
         self.labels["motortemp"].grid(row=1,column=1)
 
-        label = Label(statsframe, text="Battery Temperature:", anchor=W, wraplength=WIDTH/7,bg=FILL3, justify=LEFT,
+        label = Label(statsframe, text="Battery Temperature:", anchor=W, wraplength=self.WIDTH/7,bg=FILL3, justify=LEFT,
                          font=("Helvetica", 9, "bold"), padx=10)
         label.grid(row=1, column=2)
         self.labels["batterytemp"] = Label(statsframe, text="0"+str(self.datalist.dataunits["batterytemp"]), anchor=W,bg=FILL3, font=("Helvetica", 16))
         self.labels["batterytemp"].grid(row=1,column=3)
 
-        label = Label(speedframe, text="Motor RPM:", width=WIDTH/16, anchor=W, bg=FILL2,
+        label = Label(speedframe, text="Motor RPM:", width=self.WIDTH/16, anchor=W, bg=FILL2,
                          font=("Helvetica", 12, "bold"), padx=10)
         label.grid(row=0, column=0)
-        self.labels["motorrpm"] = Label(speedframe, text="0"+str(self.datalist.dataunits["motorrpm"]),width=WIDTH/80,anchor=W,bg=FILL2, font=("Helvetica", 48), padx=10)
+        self.labels["motorrpm"] = Label(speedframe, text="0"+str(self.datalist.dataunits["motorrpm"]),width=self.WIDTH/80,anchor=W,bg=FILL2, font=("Helvetica", 48), padx=10)
         self.labels["motorrpm"].grid(row=1, column=0, sticky=W)
 
-        label = Label(statsframe, text="Solar Panel Voltage:", anchor=W, wraplength=WIDTH/7,bg=FILL3, justify=LEFT,
+        label = Label(statsframe, text="Solar Panel Voltage:", anchor=W, wraplength=self.WIDTH/7,bg=FILL3, justify=LEFT,
                          font=("Helvetica", 9, "bold"), padx=10)
         label.grid(row=0, column=2)
         self.labels["solarvolt"] = Label(statsframe, text="0"+str(self.datalist.dataunits["solarvolt"]), anchor=W,bg=FILL3, font=("Helvetica", 16))
         self.labels["solarvolt"].grid(row=0,column=3)
 
-        label = Label(batteryframe, text="Battery Voltage:", height=1, width=WIDTH/16, anchor=W, bg=FILL4,
+        label = Label(batteryframe, text="Battery Voltage:", height=1, width=self.WIDTH/16, anchor=W, bg=FILL4,
                          font=("Helvetica", 12, "bold"), padx=10)
         label.grid(row=0, columnspan=2)
-        self.labels["batvolt"] = Label(batteryframe, text="0"+str(self.datalist.dataunits["batvolt"]), bg=FILL4, font=("Helvetica", 24), pady=HEIGHT/40) #blue-ish
+        self.labels["batvolt"] = Label(batteryframe, text="0"+str(self.datalist.dataunits["batvolt"]), bg=FILL4, font=("Helvetica", 24), pady=self.HEIGHT/40) #blue-ish
         self.labels["batvolt"].grid(row=1, column=0, sticky=E)
 
         '''**************************************************************************'''
@@ -224,11 +241,24 @@ class Display():
         #canvas for displaying the charging meter
         label= Label(chargeframe, text="Charging meter:", font=("Helvetica", 12, "bold"), anchor=W, bg=FILL5, justify=LEFT, padx=10)
         label.grid(row=0, column=0)
-        self.chargedisplay=Canvas(chargeframe, bg=FILL5, highlightthickness=0, width=chargeframe.winfo_reqwidth()*3/4, height=chargeframe.winfo_reqheight())
+        self.chargedisplay = Canvas(chargeframe, bg=FILL5, highlightthickness=0, width=chargeframe.winfo_reqwidth()*3/4, height=chargeframe.winfo_reqheight())
         self.chargedisplay.grid(row=0, column=1)
         self.chargedisplay.create_rectangle(5, 7, self.chargedisplay.winfo_reqwidth()-5, self.chargedisplay.winfo_reqheight()-7, width=2)
         self.chargedisplay.create_line(self.chargedisplay.winfo_reqwidth()/2, 7, self.chargedisplay.winfo_reqwidth()/2, 0, width=2)
         self.chargedisplay.create_rectangle(5, 7, (self.chargedisplay.winfo_reqwidth()-10)*self.chargedrainratio+5, self.chargedisplay.winfo_reqheight()-7, fill=WARN, width=2, tag="level")
+
+
+        PILimage = Image.open("Images\disconnected.png")
+        if PILimage is not None:
+            scale_w = self.WIDTH/600.0
+            scale_h = self.HEIGHT/350.0
+            PILimage = PILimage.resize((int(32*scale_w), int(32*scale_h)), Image.ANTIALIAS) #The (250, 250) is (height, width)
+            self.icons["connection"] = ImageTk.PhotoImage(PILimage)
+            if self.icons["connection"] is not None:
+
+                self.labels["connectIcon"]=Label(errorframe,image=self.icons["connection"], justify=CENTER, highlightcolor="BLACK", highlightthickness=2, height=50)
+                self.labels["connectIcon"].grid(row=0, sticky=N)
+
 
         #fine tuning the positioning of labels
         buttonframe.grid_columnconfigure(0, weight=1)
@@ -243,6 +273,7 @@ class Display():
         speedframe.grid_rowconfigure(1, weight=7)
         batteryframe.grid_columnconfigure(0, weight=1)
         batteryframe.grid_columnconfigure(1, weight=1)
+        errorframe.grid_columnconfigure(0, weight=1)
 
         #start updating the gui
         self.update()

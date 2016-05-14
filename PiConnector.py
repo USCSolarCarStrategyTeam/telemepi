@@ -8,10 +8,11 @@ import time
 #will automatically try to connect if disconnected
 #print statements make the code pretty self explanatory
 class Connector:
-    HOST='192.168.1.109'
+    HOST=socket.gethostbyname('BabyGu')
     PORT=13000
     message=''
     connected=False
+    statusChanged=False
     input=''
     TIMEOUT=1
     sock=object
@@ -57,6 +58,7 @@ class Connector:
             print('****************Trying to connect*******************')
             self.sock.connect((self.HOST,self.PORT))
             self.connected = True
+            self.statusChanged=True
             print('***************Connection established***************')
         except:
             self.sock.close()
@@ -119,6 +121,7 @@ class Connector:
                 print 'connection already closed'
             self.sock.close()
             self.connected=False
+            self.statusChanged=True
             print "connected set to false***"
             if ~self.quit:
                 print "starting client from closeserv"
