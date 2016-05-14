@@ -9,9 +9,9 @@ import time
 #print statements make the code pretty self explanatory
 class Connector:
     try:
-    	HOST=socket.gethostbyname('GuLaptop')
+        HOST=socket.gethostbyname('GuLaptop')
     except:
-	HOST='192.168.1.109'
+        HOST='192.168.1.109'
 
     #comment this out eventually
     HOST='192.168.1.109'
@@ -26,7 +26,7 @@ class Connector:
     quit=False
 
     def __init__(self, data):
-	print 'Host ip set as: '+self.HOST
+        print 'Host ip set as: '+self.HOST
         self.datalist = data
         try:
             thread1 = threading.Thread(target=self.startclient, args=())

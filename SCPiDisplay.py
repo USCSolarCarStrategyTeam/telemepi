@@ -20,7 +20,8 @@ BAD="#ff9980"
 WARN="#ffffb3"
 GOOD="#33cc33"
 
-PATHROOT="/home/pi/Desktop/telemepi/"
+#PATHROOT="/home/pi/Desktop/telemepi/"
+PATHROOT=""
 
 #the purpose of this class is just for displaying values and updating them in the GUI
 #values will be stored in DataLists class in Datalists
@@ -107,7 +108,7 @@ class Display():
         if self.connector.statusChanged:
             print("Connection status changed")
             if self.connector.connected:
-                PILimage = Image.open(PATHROOT+"/Images/connected.png")
+                PILimage = Image.open(PATHROOT+"Images/connected.png")
                 scale_w = self.WIDTH/600.0
                 scale_h = self.HEIGHT/350.0
                 PILimage = PILimage.resize((int(32*scale_w), int(32*scale_h)), Image.ANTIALIAS) #The (250, 250) is (height, width)
@@ -115,7 +116,7 @@ class Display():
                     self.icons["connection"] = ImageTk.PhotoImage(PILimage)
                     self.labels["connectIcon"].config(image=self.icons["connection"])
             else:
-                PILimage = Image.open(PATHROOT+"/Images/disconnected.png")
+                PILimage = Image.open(PATHROOT+"Images/disconnected.png")
                 scale_w = self.WIDTH/600.0
                 scale_h = self.HEIGHT/350.0
                 PILimage = PILimage.resize((int(32*scale_w), int(32*scale_h)), Image.ANTIALIAS) #The (250, 250) is (height, width)
@@ -247,7 +248,7 @@ class Display():
         self.chargedisplay.create_rectangle(5, 7, (self.chargedisplay.winfo_reqwidth()-10)*self.chargedrainratio+5, self.chargedisplay.winfo_reqheight()-7, fill=WARN, width=2, tag="level")
 
 
-        PILimage = Image.open(PATHROOT+"/Images/disconnected.png")
+        PILimage = Image.open(PATHROOT+"Images/disconnected.png")
         if PILimage is not None:
             scale_w = self.WIDTH/600.0
             scale_h = self.HEIGHT/350.0
