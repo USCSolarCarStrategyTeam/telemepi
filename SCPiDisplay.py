@@ -3,7 +3,7 @@ __author__ = 'YutongGu'
 from PiConnector import *
 from Tkinter import *
 from Datalists import Datalists
-from PiReader import valueReader
+from PiReader import valueReader #@#################comment out when testing on laptop#####################
 from PIL import Image, ImageTk
 import datetime
 #!/usr/bin/env python
@@ -16,12 +16,13 @@ FILL3="#00e6e6"
 FILL4="#1affff"
 FILL5="#99ffff"
 FILL6="#ccffff"
+FILL7="WHITE"
 BAD="#ff9980"
 WARN="#ffffb3"
 GOOD="#33cc33"
 
-#PATHROOT="/home/pi/Desktop/telemepi/"
-PATHROOT=""
+PATHROOT="/home/pi/Desktop/telemepi/"   #for raspberry pi
+#PATHROOT=""                            #for laptop
 
 #the purpose of this class is just for displaying values and updating them in the GUI
 #values will be stored in DataLists class in Datalists
@@ -46,7 +47,7 @@ class Display():
     #close all sockets, stops reading values and clears GPIO pins before closing program
     def quit(self):
         self.connector.closeall()
-        self.reader.quit()
+        self.reader.quit() #@#################comment out when testing on laptop#####################
         print "Master quit"
         self.master.quit()
 
@@ -140,7 +141,7 @@ class Display():
         #create the datalist, connector, valueReader, and the TK window
         self.datalist = Datalists()
         self.connector = Connector(self.datalist)
-        self.reader = valueReader(self.datalist)
+        self.reader = valueReader(self.datalist) #@#################comment out when testing on laptop#####################
         self.master = Toplevel()
 
         #give the window its dimensions and title
@@ -168,7 +169,7 @@ class Display():
         batteryframe.grid(row=1, column=1, rowspan=2)
 
         #frame for warning/error icons
-        errorframe=Frame(self.master, height=4*self.HEIGHT/5, width=self.WIDTH/8)
+        errorframe=Frame(self.master, height=4*self.HEIGHT/5, width=self.WIDTH/8, bg=FILL7)
         errorframe.grid_propagate(0)
         errorframe.grid(row=1, column=2, rowspan=2)
 
@@ -256,7 +257,7 @@ class Display():
             self.icons["connection"] = ImageTk.PhotoImage(PILimage)
             if self.icons["connection"] is not None:
 
-                self.labels["connectIcon"]=Label(errorframe,image=self.icons["connection"], justify=CENTER, highlightcolor="BLACK", highlightthickness=2, height=50)
+                self.labels["connectIcon"]=Label(errorframe,image=self.icons["connection"], justify=CENTER, height=50, bg=FILL7)
                 self.labels["connectIcon"].grid(row=0, sticky=N)
 
 
