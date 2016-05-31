@@ -3,7 +3,7 @@ __author__ = 'YutongGu'
 from PiConnector import *
 from Tkinter import *
 from Datalists import Datalists
-from PiReader import valueReader #@#################comment out when testing on laptop#####################
+#from PiReader import valueReader #@#################comment out when testing on laptop#####################
 from PIL import Image, ImageTk
 import datetime
 #!/usr/bin/env python
@@ -21,8 +21,9 @@ BAD="#ff9980"
 WARN="#ffffb3"
 GOOD="#33cc33"
 
-PATHROOT="/home/pi/Desktop/telemepi/"   #for raspberry pi
-#PATHROOT=""                            #for laptop
+#Path for icons which I got from http://www.flaticon.com/free-icons/wifi_358/3
+#PATHROOT="/home/pi/Desktop/telemepi/"   #for raspberry pi
+PATHROOT=""                            #for laptop
 
 #the purpose of this class is just for displaying values and updating them in the GUI
 #values will be stored in DataLists class in Datalists
@@ -47,7 +48,7 @@ class Display():
     #close all sockets, stops reading values and clears GPIO pins before closing program
     def quit(self):
         self.connector.closeall()
-        self.reader.quit() #@#################comment out when testing on laptop#####################
+        #self.reader.quit() #@#################comment out when testing on laptop#####################
         print "Master quit"
         self.master.quit()
 
@@ -141,7 +142,7 @@ class Display():
         #create the datalist, connector, valueReader, and the TK window
         self.datalist = Datalists()
         self.connector = Connector(self.datalist)
-        self.reader = valueReader(self.datalist) #@#################comment out when testing on laptop#####################
+        #self.reader = valueReader(self.datalist) #@#################comment out when testing on laptop#####################
         self.master = Toplevel()
 
         #give the window its dimensions and title

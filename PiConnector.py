@@ -14,7 +14,8 @@ class Connector:
         HOST='192.168.1.109'
 
     #comment this out eventually
-    HOST='192.168.1.109'
+    #useful resource for connecting using DNS: http://unix.stackexchange.com/questions/16890/how-to-make-a-machine-accessible-from-the-lan-using-its-hostname
+    #HOST='192.168.1.109'
 
     PORT=13000
     message=''
@@ -51,7 +52,7 @@ class Connector:
             print "****************Setting up socket*******************"
             try:
                 #create an AF_INET, STREAM socket (TCP)
-                self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
                 self.sock.settimeout(self.TIMEOUT)
             except:
                 print 'Failed to create socket'
