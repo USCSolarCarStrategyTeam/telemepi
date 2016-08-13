@@ -8,19 +8,9 @@ import time
 #will automatically try to connect if disconnected
 #print statements make the code pretty self explanatory
 class Connector:
-    try:
-        HOST=socket.gethostbyname('GuLaptop.yutong.gu.com')
-    except:
-	print 'Failed to resolve hostname, going with default'
-        HOST='192.168.1.110'
+    #figure out a better solution eventually
+    HOST='192.168.1.110'
 
-    #comment this out eventually
-#<<<<<<< HEAD
-    # HOST='192.168.118.1'
-#=======
-    #useful resource for connecting using DNS: http://unix.stackexchange.com/questions/16890/how-to-make-a-machine-accessible-from-the-lan-using-its-hostname
-    #HOST='192.168.1.109'
-#>>>>>>> b5ffdc2ff4b452cd2e4c742a4772872d619ff8c6
 
     PORT=13000
     message=''
