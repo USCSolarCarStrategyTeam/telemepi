@@ -21,14 +21,11 @@ BAD="#ff9980"
 WARN="#ffffb3"
 GOOD="#33cc33"
 
-#<<<<<<< HEAD
-PATHROOT="/home/pi/Desktop/telemepi/"
-#PATHROOT=""
-#=======
+
+
 #Path for icons which I got from http://www.flaticon.com/free-icons/wifi_358/3
-#PATHROOT="/home/pi/Desktop/telemepi/"   #for raspberry pi
-PATHROOT=""                            #for laptop
-#>>>>>>> b5ffdc2ff4b452cd2e4c742a4772872d619ff8c6
+PATHROOT="/home/pi/Desktop/telemepi/"   #for raspberry pi
+#PATHROOT=""                            #for laptop
 
 #the purpose of this class is just for displaying values and updating them in the GUI
 #values will be stored in DataLists class in Datalists
