@@ -20,8 +20,8 @@ BAD="#ff9980"
 WARN="#ffffb3"
 GOOD="#33cc33"
 
-#PATHROOT="/home/pi/Desktop/telemepi/"
-PATHROOT=""
+PATHROOT="/home/pi/Desktop/telemepi/"
+#PATHROOT=""
 
 #the purpose of this class is just for displaying values and updating them in the GUI
 #values will be stored in DataLists class in Datalists

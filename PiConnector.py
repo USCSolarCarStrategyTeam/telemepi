@@ -9,12 +9,12 @@ import time
 #print statements make the code pretty self explanatory
 class Connector:
     try:
-        HOST=socket.gethostbyname('GuLaptop')
+        HOST=socket.gethostbyname('GuLaptop.yutong.gu.com')
     except:
-        HOST='192.168.1.109'
+        HOST='192.168.1.110'
 
     #comment this out eventually
-    HOST='192.168.1.109'
+    # HOST='192.168.118.1'
 
     PORT=13000
     message=''
@@ -63,7 +63,7 @@ class Connector:
 
     def connect(self):
         try:
-            print('****************Trying to connect*******************')
+            print('***********Trying to connect to '+self.HOST+'*************')
             self.sock.connect((self.HOST,self.PORT))
             self.connected = True
             self.statusChanged=True
