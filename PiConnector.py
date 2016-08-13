@@ -11,10 +11,16 @@ class Connector:
     try:
         HOST=socket.gethostbyname('GuLaptop.yutong.gu.com')
     except:
+	print 'Failed to resolve hostname, going with default'
         HOST='192.168.1.110'
 
     #comment this out eventually
+#<<<<<<< HEAD
     # HOST='192.168.118.1'
+#=======
+    #useful resource for connecting using DNS: http://unix.stackexchange.com/questions/16890/how-to-make-a-machine-accessible-from-the-lan-using-its-hostname
+    #HOST='192.168.1.109'
+#>>>>>>> b5ffdc2ff4b452cd2e4c742a4772872d619ff8c6
 
     PORT=13000
     message=''
@@ -51,7 +57,7 @@ class Connector:
             print "****************Setting up socket*******************"
             try:
                 #create an AF_INET, STREAM socket (TCP)
-                self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
                 self.sock.settimeout(self.TIMEOUT)
             except:
                 print 'Failed to create socket'

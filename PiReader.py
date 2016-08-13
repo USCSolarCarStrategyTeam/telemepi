@@ -36,6 +36,7 @@ class valueReader:
         GPIO.setup(self.SPICLK, GPIO.OUT)
         GPIO.setup(self.SPICS[0], GPIO.OUT)
         GPIO.setup(self.SPICS[1], GPIO.OUT)
+	print 'GPIO set up'
 
         #start sampling
         try:
