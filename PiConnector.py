@@ -9,7 +9,7 @@ import time
 #print statements make the code pretty self explanatory
 class Connector:
     #figure out a better solution eventually
-    HOST='192.168.1.110'
+    HOST='empty'
 
 
     PORT=13000
@@ -18,11 +18,10 @@ class Connector:
     statusChanged=False
     input=''
     TIMEOUT=1
-    sock=object
+    sock=None
     quit=False
 
     def __init__(self, data):
-        print 'Host ip set as: '+self.HOST
         self.datalist = data
         try:
             thread1 = threading.Thread(target=self.startclient, args=())
@@ -41,6 +40,28 @@ class Connector:
     def startclient(self):
         #set up socket
         print "starting client"
+        sender=("empty","")
+        try:
+            self.b = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            self.b.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            print 'Created broadcast socket'
+        except socket.error:
+            print 'Failed to create broadcast socket'
+            return
+
+        while(self.HOST == 'empty'):
+            try :
+                print 'broadcasting'
+                self.b.sendto('message', ('localhost', 9999))
+                print 'receiving'
+                self.HOST, sender = self.b.recvfrom(1024)
+
+            except socket.error, msg:
+                print 'Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
+            print "Recieved "+self.HOST+" from "+sender[0]
+            time.sleep(2)
+
+        print 'Host ip set as: '+self.HOST
 
         while self.connected==False and ~self.quit:
 
