@@ -44,6 +44,7 @@ class Connector:
         try:
             self.b = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             self.b.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            self.b.settimeout(2)
             print 'Created broadcast socket'
         except socket.error:
             print 'Failed to create broadcast socket'
@@ -52,12 +53,13 @@ class Connector:
         while(self.HOST == 'empty'):
             try :
                 print 'broadcasting'
-                self.b.sendto('message', ('localhost', 9999))
+                self.b.sendto('message', ('<broadcast>', 9999))
                 print 'receiving'
                 self.HOST, sender = self.b.recvfrom(1024)
 
             except socket.error, msg:
-                print 'Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
+                print 'Error Code : ' + str(msg[0])
+                #print 'Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
             print "Recieved "+self.HOST+" from "+sender[0]
             time.sleep(2)
 
