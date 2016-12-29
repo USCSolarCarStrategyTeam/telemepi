@@ -81,12 +81,14 @@ class Connector:
 
 
     def connect(self):
+        print '\nNumber of threads:' + str(threading.active_count())+'\n'
         try:
             print('***********Trying to connect to '+self.HOST+'*************')
             self.sock.connect((self.HOST,self.PORT))
             self.connected = True
             self.statusChanged=True
             print('***************Connection established***************')
+
         except:
             self.sock.close()
             del self.sock
@@ -110,13 +112,13 @@ class Connector:
                 polling=self.sock.recv(16)
             except socket.timeout:
                 print("Connection timed out. Disconnected")
-                thread3 = threading.Thread(target=self.closeserv, args=())
+                thread3 = threading.Thread(target=self.closeclient, args=())
                 thread3.daemon = True
                 thread3.start()
                 break
             except socket.error:
                 print"error"
-                thread3 = threading.Thread(target=self.closeserv, args=())
+                thread3 = threading.Thread(target=self.closeclient, args=())
                 thread3.daemon = True
                 thread3.start()
                 break
@@ -126,7 +128,7 @@ class Connector:
                     message = message+x+':'+str(self.datalist.data[x])+';'
                 message = message[:-1]
                 if failedAttempts >= 50:
-                    self.closeserv()
+                    self.closeclient()
                     break
                 try:
                     self.sock.sendall(message)
@@ -135,12 +137,12 @@ class Connector:
                     failedAttempts += 1
             else:
                 print"error"
-                thread3 = threading.Thread(target=self.closeserv, args=())
+                thread3 = threading.Thread(target=self.closeclient, args=())
                 thread3.daemon = True
                 thread3.start()
                 break
             
-    def closeserv(self):
+    def closeclient(self):
         if self.connected:
             try:
                 self.sock.sendall("quit")
