@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="277739d1-f743-4725-a405-257fe783c3b6" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PiConnector.py" afterPath="$PROJECT_DIR$/PiConnector.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-    </list>
+    <list default="true" id="277739d1-f743-4725-a405-257fe783c3b6" name="Default" comment="" />
     <ignored path="telemepi.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -24,10 +21,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="PiConnector.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="PiConnector.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PiConnector.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-3.1764705">
+            <state vertical-scroll-proportion="0.20454545">
               <caret line="83" column="72" selection-start-line="83" selection-start-column="72" selection-end-line="83" selection-end-column="72" />
               <folding>
                 <element signature="e#25#38#0" expanded="true" />
@@ -36,10 +33,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SCPiDisplay.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="SCPiDisplay.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SCPiDisplay.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.020833334">
+            <state vertical-scroll-proportion="0.32352942">
               <caret line="126" column="40" selection-start-line="126" selection-start-column="40" selection-end-line="126" selection-end-column="40" />
               <folding>
                 <element signature="e#25#50#0" expanded="true" />
@@ -833,22 +830,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/PiConnector.py">
+    <entry file="file://$PROJECT_DIR$/SCPiDisplay.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-3.1764705">
-          <caret line="83" column="72" selection-start-line="83" selection-start-column="72" selection-end-line="83" selection-end-column="72" />
+        <state vertical-scroll-proportion="0.32352942">
+          <caret line="126" column="40" selection-start-line="126" selection-start-column="40" selection-end-line="126" selection-end-column="40" />
           <folding>
-            <element signature="e#25#38#0" expanded="true" />
+            <element signature="e#25#50#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SCPiDisplay.py">
+    <entry file="file://$PROJECT_DIR$/PiConnector.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.020833334">
-          <caret line="126" column="40" selection-start-line="126" selection-start-column="40" selection-end-line="126" selection-end-column="40" />
+        <state vertical-scroll-proportion="0.20454545">
+          <caret line="83" column="72" selection-start-line="83" selection-start-column="72" selection-end-line="83" selection-end-column="72" />
           <folding>
-            <element signature="e#25#50#0" expanded="true" />
+            <element signature="e#25#38#0" expanded="true" />
           </folding>
         </state>
       </provider>
